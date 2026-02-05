@@ -1,0 +1,62 @@
+@font-face { font-family: 'Bradley Hand'; src: url('BradleyHandITCTT-Bold.ttf'); }
+
+body {
+    font-family: 'Bradley Hand', cursive;
+    background: url('Background.png');
+    background-size: cover;
+    margin: 0;
+    padding: 5vw;
+}
+
+.back {
+    font-size: 2vw;
+    color: #8B4513;
+    text-decoration: none;
+}
+
+h1 {
+    font-size: 5vw;
+    color: #8B4513;
+    margin: 2vw 0 4vw 0;
+}
+
+h1 u {
+    text-decoration: none;
+    border-bottom: 0.3vw solid #8B4513;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3vw;
+}
+
+.card {
+    background: rgba(255,255,255,0.7);
+    padding: 2vw;
+    border-radius: 1vw;
+}
+
+.card h2 {
+    font-size: 2.5vw;
+    color: #8B4513;
+    margin: 0 0 1vw 0;
+}
+
+.card p {
+    font-size: 1.2vw;
+    color: #4a4a4a;
+    line-height: 1.4;
+    margin-bottom: 1.5vw;
+}
+
+.card iframe {
+    width: 100%;
+    height: 30vw;
+    border: none;
+    border-radius: 0.5vw;
+}
+
+.card.wide {
+    grid-column: span 2;
+}
