@@ -20,3 +20,6 @@ a { font-size: 3vw; color: #8B4513; text-decoration: none; display: block; margi
 
 .title { font-size: 3vw; color: #8B4513; display: block; margin-bottom: 1.2vw; line-height: 1.1; }
 .text3 p { font-size: 1.5vw; }
+
+.about-link { font-size: 1.6vw; margin-top: 1.5vw; }
+.about-link u { text-decoration: none; border-bottom: 0.15vw solid #8B4513; }
