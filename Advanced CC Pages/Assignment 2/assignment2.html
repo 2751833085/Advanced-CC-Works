@@ -1,0 +1,93 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Assignment 2 - Words in Motion</title>
+    <link rel="stylesheet" href="assignment2.css">
+</head>
+<body>
+    <a href="../advanced-cc.html" class="back">← Back</a>
+    <h1>Assignment 2: <u>Words in Motion</u></h1>
+    <p class="intro">Three words, each expressed through three different dynamic visual interpretations using P5JS.</p>
+
+    <!-- Group 1: Minimize -->
+    <h2 class="group-title">I. Minimize</h2>
+    <div class="grid">
+        <div class="card">
+            <h3>Minimize — Version A</h3>
+            <div class="iframe-wrapper">
+                <iframe src="https://editor.p5js.org/2751833085/embed/yiAsTis6B" scrolling="no"></iframe>
+            </div>
+        </div>
+        <div class="card">
+            <h3>Minimize — Version B</h3>
+            <div class="iframe-wrapper">
+                <iframe src="https://editor.p5js.org/2751833085/embed/Y9i4mUvHr" scrolling="no"></iframe>
+            </div>
+        </div>
+        <div class="card">
+            <h3>Minimize — Version C</h3>
+            <div class="iframe-wrapper">
+                <iframe src="https://editor.p5js.org/2751833085/embed/Pbnt99CmM" scrolling="no"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Group 2: Procrastinate -->
+    <h2 class="group-title">II. Procrastinate</h2>
+    <div class="grid">
+        <div class="card">
+            <h3>Procrastinate — Version A</h3>
+            <div class="iframe-wrapper">
+                <iframe src="https://editor.p5js.org/2751833085/embed/2xFT24rc3" scrolling="no"></iframe>
+            </div>
+        </div>
+        <div class="card">
+            <h3>Procrastinate — Version B</h3>
+            <div class="iframe-wrapper">
+                <iframe src="https://editor.p5js.org/2751833085/embed/GbLbvY6y8" scrolling="no"></iframe>
+            </div>
+        </div>
+        <div class="card">
+            <h3>Procrastinate — Version C</h3>
+            <div class="iframe-wrapper">
+                <iframe src="https://editor.p5js.org/2751833085/embed/HAlllVG_i" scrolling="no"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Group 3: Irony -->
+    <h2 class="group-title">III. Irony</h2>
+    <div class="grid">
+        <div class="card">
+            <h3>Irony — Version A</h3>
+            <div class="iframe-wrapper">
+                <iframe src="https://editor.p5js.org/2751833085/embed/Ft-Dt4KvA" scrolling="no"></iframe>
+            </div>
+        </div>
+        <div class="card">
+            <h3>Irony — Version B</h3>
+            <div class="iframe-wrapper">
+                <iframe src="https://editor.p5js.org/2751833085/embed/egKWpqrxJ" scrolling="no"></iframe>
+            </div>
+        </div>
+        <div class="card">
+            <h3>Irony — Version C</h3>
+            <div class="iframe-wrapper">
+                <iframe src="https://editor.p5js.org/2751833085/embed/lD_GDHhCj" scrolling="no"></iframe>
+            </div>
+        </div>
+    </div>
+    <script>
+        function scaleIframes() {
+            document.querySelectorAll('.iframe-wrapper').forEach(function(wrapper) {
+                var iframe = wrapper.querySelector('iframe');
+                var scale = wrapper.clientWidth / 600;
+                iframe.style.transform = 'scale(' + scale + ')';
+                iframe.style.top = (-46 * scale) + 'px';
+            });
+        }
+        window.addEventListener('load', scaleIframes);
+        window.addEventListener('resize', scaleIframes);
+    </script>
+</body>
+</html>

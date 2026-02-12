@@ -1,0 +1,79 @@
+@font-face { font-family: 'Bradley Hand'; src: url('../../RES/BradleyHandITCTT-Bold.ttf'); }
+
+body {
+    font-family: 'Bradley Hand', cursive;
+    background: url('../../RES/Background.png');
+    background-size: cover;
+    background-attachment: fixed;
+    margin: 0;
+    padding: 5vw;
+}
+
+.back {
+    font-size: 2vw;
+    color: #8B4513;
+    text-decoration: none;
+}
+
+h1 {
+    font-size: 5vw;
+    color: #8B4513;
+    margin: 2vw 0 1vw 0;
+}
+
+h1 u {
+    text-decoration: none;
+    border-bottom: 0.3vw solid #8B4513;
+}
+
+.intro {
+    font-size: 1.5vw;
+    color: #4a4a4a;
+    margin-bottom: 1vw;
+    line-height: 1.4;
+}
+
+.group-title {
+    font-size: 3.5vw;
+    color: #8B4513;
+    margin: 1.5vw 0 1.5vw 0;
+    padding-bottom: 0.5vw;
+    border-bottom: 0.15vw solid #8B4513;
+    display: inline-block;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3vw;
+    margin-bottom: 2vw;
+}
+
+.card {
+    background: rgba(255,255,255,0.7);
+    padding: 2vw;
+    border-radius: 1vw;
+}
+
+.card h3 {
+    font-size: 1.8vw;
+    color: #8B4513;
+    margin: 0 0 1vw 0;
+}
+
+.card .iframe-wrapper {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 0.5vw;
+    position: relative;
+}
+
+.card .iframe-wrapper iframe {
+    width: 600px;
+    height: 640px;
+    border: none;
+    display: block;
+    position: absolute;
+    transform-origin: 0 0;
+}

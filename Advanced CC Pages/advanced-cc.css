@@ -1,8 +1,8 @@
-@font-face { font-family: 'Bradley Hand'; src: url('BradleyHandITCTT-Bold.ttf'); }
+@font-face { font-family: 'Bradley Hand'; src: url('../RES/BradleyHandITCTT-Bold.ttf'); }
 
 body {
     font-family: 'Bradley Hand', cursive;
-    background: url('Background.png');
+    background: url('../RES/Background.png');
     background-size: cover;
     margin: 0;
     padding: 5vw;
@@ -52,4 +52,13 @@ h1 u {
 
 .card.wide {
     grid-column: span 2;
+}
+
+.card h2 a {
+    color: #8B4513;
+    text-decoration: none;
+}
+
+.card h2 a:hover {
+    text-decoration: underline;
 }

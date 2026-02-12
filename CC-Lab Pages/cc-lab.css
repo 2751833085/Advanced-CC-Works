@@ -1,8 +1,8 @@
-@font-face { font-family: 'Bradley Hand'; src: url('BradleyHandITCTT-Bold.ttf'); }
+@font-face { font-family: 'Bradley Hand'; src: url('../RES/BradleyHandITCTT-Bold.ttf'); }
 
 body {
     font-family: 'Bradley Hand', cursive;
-    background: url('Background.png');
+    background: url('../RES/Background.png');
     background-size: cover;
     margin: 0;
     padding: 5vw;
