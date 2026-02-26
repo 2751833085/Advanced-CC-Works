@@ -15,19 +15,19 @@
         <div class="card">
             <h3>Minimize — Version A</h3>
             <div class="iframe-wrapper">
-                <iframe src="https://editor.p5js.org/2751833085/embed/yiAsTis6B" scrolling="no"></iframe>
+                <iframe src="sketches/1-1/index.html" scrolling="no"></iframe>
             </div>
         </div>
         <div class="card">
             <h3>Minimize — Version B</h3>
             <div class="iframe-wrapper">
-                <iframe src="https://editor.p5js.org/2751833085/embed/Y9i4mUvHr" scrolling="no"></iframe>
+                <iframe src="sketches/1-2/index.html" scrolling="no"></iframe>
             </div>
         </div>
         <div class="card">
             <h3>Minimize — Version C</h3>
             <div class="iframe-wrapper">
-                <iframe src="https://editor.p5js.org/2751833085/embed/Pbnt99CmM" scrolling="no"></iframe>
+                <iframe src="sketches/1-3/index.html" scrolling="no"></iframe>
             </div>
         </div>
     </div>
@@ -38,19 +38,19 @@
         <div class="card">
             <h3>Procrastinate — Version A</h3>
             <div class="iframe-wrapper">
-                <iframe src="https://editor.p5js.org/2751833085/embed/2xFT24rc3" scrolling="no"></iframe>
+                <iframe src="sketches/2-1/index.html" scrolling="no"></iframe>
             </div>
         </div>
         <div class="card">
             <h3>Procrastinate — Version B</h3>
             <div class="iframe-wrapper">
-                <iframe src="https://editor.p5js.org/2751833085/embed/GbLbvY6y8" scrolling="no"></iframe>
+                <iframe src="sketches/2-2/index.html" scrolling="no"></iframe>
             </div>
         </div>
         <div class="card">
             <h3>Procrastinate — Version C</h3>
             <div class="iframe-wrapper">
-                <iframe src="https://editor.p5js.org/2751833085/embed/HAlllVG_i" scrolling="no"></iframe>
+                <iframe src="sketches/2-3/index.html" scrolling="no"></iframe>
             </div>
         </div>
     </div>
@@ -61,19 +61,19 @@
         <div class="card">
             <h3>Irony — Version A</h3>
             <div class="iframe-wrapper">
-                <iframe src="https://editor.p5js.org/2751833085/embed/Ft-Dt4KvA" scrolling="no"></iframe>
+                <iframe src="sketches/3-1/index.html" scrolling="no"></iframe>
             </div>
         </div>
         <div class="card">
             <h3>Irony — Version B</h3>
             <div class="iframe-wrapper">
-                <iframe src="https://editor.p5js.org/2751833085/embed/egKWpqrxJ" scrolling="no"></iframe>
+                <iframe src="sketches/3-2/index.html" scrolling="no"></iframe>
             </div>
         </div>
         <div class="card">
             <h3>Irony — Version C</h3>
             <div class="iframe-wrapper">
-                <iframe src="https://editor.p5js.org/2751833085/embed/lD_GDHhCj" scrolling="no"></iframe>
+                <iframe src="sketches/3-3/index.html" scrolling="no"></iframe>
             </div>
         </div>
     </div>
@@ -82,15 +82,15 @@
     <h2 class="group-title">IV. Final Work</h2>
     <div class="grid">
         <div class="card">
-            <h3><a href="https://editor.p5js.org/2751833085/full/v5oIzGW6L" target="_blank" rel="noopener noreferrer">Minimize</a></h3>
+            <h3><a href="sketches/Final%201/index.html" target="_blank" rel="noopener noreferrer">Minimize</a></h3>
             <p class="link-hint">Click to view work →</p>
         </div>
         <div class="card">
-            <h3><a href="https://editor.p5js.org/2751833085/full/hVymCG0SU" target="_blank" rel="noopener noreferrer">Irony</a></h3>
+            <h3><a href="sketches/Final%202/index.html" target="_blank" rel="noopener noreferrer">Irony</a></h3>
             <p class="link-hint">Click to view work →</p>
         </div>
         <div class="card">
-            <h3><a href="https://editor.p5js.org/2751833085/full/5C0VlO_XF" target="_blank" rel="noopener noreferrer">Procrastinate</a></h3>
+            <h3><a href="sketches/Final%203/index.html" target="_blank" rel="noopener noreferrer">Procrastinate</a></h3>
             <p class="link-hint">Click to view work →</p>
         </div>
     </div>
@@ -98,9 +98,10 @@
         function scaleIframes() {
             document.querySelectorAll('.iframe-wrapper').forEach(function(wrapper) {
                 var iframe = wrapper.querySelector('iframe');
+                if (!iframe) return;
                 var scale = wrapper.clientWidth / 600;
                 iframe.style.transform = 'scale(' + scale + ')';
-                iframe.style.top = (-46 * scale) + 'px';
+                iframe.style.transformOrigin = 'top left';
             });
         }
         window.addEventListener('load', scaleIframes);

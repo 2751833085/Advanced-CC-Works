@@ -71,11 +71,13 @@ h1 u {
 
 .card .iframe-wrapper iframe {
     width: 600px;
-    height: 640px;
+    height: 600px;
     border: none;
     display: block;
     position: absolute;
-    transform-origin: 0 0;
+    top: 0;
+    left: 0;
+    transform-origin: top left;
 }
 
 /* Final Work link cards */
