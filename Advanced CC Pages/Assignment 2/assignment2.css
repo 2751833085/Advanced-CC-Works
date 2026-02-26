@@ -77,3 +77,21 @@ h1 u {
     position: absolute;
     transform-origin: 0 0;
 }
+
+/* Final Work link cards */
+.card h3 a {
+    color: #8B4513;
+    text-decoration: none;
+    transition: color 0.2s, text-decoration 0.2s;
+}
+
+.card h3 a:hover {
+    color: #a0522d;
+    text-decoration: underline;
+}
+
+.card .link-hint {
+    font-size: 1.2vw;
+    color: #6b6b6b;
+    margin: 0;
+}
