@@ -42,5 +42,19 @@ h1 u {
 .content .placeholder {
     font-size: 1.5vw;
     color: #6b6b6b;
-    margin: 0;
+    margin: 0 0 1.5vw 0;
+}
+
+.launch-btn {
+    display: inline-block;
+    font-size: 1.4vw;
+    text-decoration: none;
+    color: #fff8e8;
+    background: #8B4513;
+    padding: 0.9vw 1.4vw;
+    border-radius: 0.6vw;
+}
+
+.launch-btn:hover {
+    background: #6f3510;
 }
