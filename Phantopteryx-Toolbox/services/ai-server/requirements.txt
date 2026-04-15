@@ -1,0 +1,14 @@
+fastapi
+httpx
+uvicorn[standard]
+numpy
+opencv-python
+Pillow
+rembg
+onnxruntime
+simple-lama-inpainting
+torch>=2.1.0
+diffusers>=0.30.0
+transformers>=4.36.0
+accelerate>=0.25.0
+safetensors>=0.4.0

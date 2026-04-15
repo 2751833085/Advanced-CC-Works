@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Phantopteryx Toolbox</title>
+  <style>
+    body {
+      font-family: monospace;
+      font-size: 18px;
+      background: #000;
+      color: #fff;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    a, button {
+      font-family: monospace;
+      color: #fff;
+      text-decoration: none;
+      border: 1px solid #fff;
+      padding: 12px 32px;
+      background: none;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    a:hover, button:hover { background: #fff; color: #000; }
+    .btns {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+    .btns a,
+    .btns button {
+      min-width: 14rem;
+      text-align: center;
+      box-sizing: border-box;
+    }
+
+    /* Info overlay */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #000;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      z-index: 1;
+    }
+    .overlay.show { display: flex; }
+    .overlay .icon {
+      width: 96px; height: 96px;
+      border-radius: 20px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .overlay .icon img { width: 100%; height: 100%; object-fit: cover; }
+    .overlay h2 { font-size: 18px; margin: 0; }
+    .overlay .detail {
+      color: #999;
+      font-size: 12px;
+      text-align: left;
+      line-height: 1.65;
+      max-width: 32rem;
+      max-height: min(52vh, 26rem);
+      overflow-y: auto;
+      padding: 0 1.25rem;
+      box-sizing: border-box;
+    }
+    .overlay .detail strong { color: #ccc; }
+    .overlay .detail .oss-h {
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #777;
+      margin: 1rem 0 0.35rem;
+      text-align: center;
+    }
+    .overlay .detail .oss-h:first-child { margin-top: 0; }
+    .overlay .detail ul {
+      margin: 0.25rem 0 0;
+      padding-left: 1.1rem;
+    }
+    .overlay .detail li { margin: 0.2rem 0; }
+    .overlay .detail code {
+      font-size: 11px;
+      color: #888;
+      word-break: break-all;
+    }
+    .overlay .detail a {
+      color: #9cf;
+      text-decoration: underline;
+      border: none;
+      padding: 0;
+      font-size: inherit;
+      display: inline;
+      min-width: 0;
+    }
+    .overlay .detail a:hover { background: transparent; color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="btns">
+    <a href="apps/image-editor/">Image Editor</a>
+    <a href="apps/divination/divination.html">Divination</a>
+    <button id="btnInfo">Info</button>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <div class="icon"><img src="icon.png" alt="icon"></div>
+    <h2>Phantopteryx Toolbox</h2>
+    <div class="detail">
+      by Oneiron · v0.1.0<br>
+      A minimal local toolkit: image editor + optional Python AI server + divination shell.<br><br>
+
+      <div class="oss-h">Open source · 图像 / AI 服务（本地）</div>
+      <ul>
+        <li><strong>Stable Diffusion inpainting</strong> — <a href="https://huggingface.co/docs/diffusers" target="_blank" rel="noopener">Hugging Face Diffusers</a> + PyTorch. Expand (<code>mode=ai</code>) defaults to SDXL <code>diffusers/stable-diffusion-xl-1.0-inpainting-0.1</code> or SD1.5 <code>runwayml/stable-diffusion-inpainting</code> (see <code>EXPAND_SD_*</code> in server README).</li>
+        <li><strong>LaMa</strong> — large-mask inpainting for fill / remove-object (<a href="https://github.com/saic-mdal/lama" target="_blank" rel="noopener">SAIC-MOD LaMa</a> weights via <code>simple-lama-inpainting</code>); OpenCV Telea fallback when configured.</li>
+        <li><strong>OpenCV</strong> — padding, mask ops, edge preview paths.</li>
+        <li><strong>FastAPI</strong> — HTTP API for <code>services/ai-server</code>.</li>
+      </ul>
+
+      <div class="oss-h">Open source · 占卜页（浏览器）</div>
+      <ul>
+        <li><strong>lunar-javascript</strong> — Gregorian ↔ lunar (<a href="https://www.npmjs.com/package/lunar-javascript" target="_blank" rel="noopener">npm</a>).</li>
+        <li><strong>iztro</strong> — Zi Wei chart helpers (<a href="https://www.npmjs.com/package/iztro" target="_blank" rel="noopener">npm</a>).</li>
+        <li><strong>I Ching text</strong> — Wilhelm-style hexagram fields from <a href="https://github.com/adamblvck/iching-wilhelm-dataset" target="_blank" rel="noopener">adamblvck/iching-wilhelm-dataset</a> (see app README for license).</li>
+      </ul>
+
+      <div class="oss-h">Editor client（无内置权重）</div>
+      <p style="margin:0.35rem 0 0;font-size:11px;color:#777;text-align:center;">Image Editor UI is plain HTML/CSS/JS. AI features call your local server only when it is running.</p>
+    </div>
+    <button id="btnClose">Close</button>
+  </div>
+
+  <script>
+    document.getElementById('btnInfo').onclick = function() {
+      document.getElementById('overlay').classList.add('show');
+    };
+    document.getElementById('btnClose').onclick = function() {
+      document.getElementById('overlay').classList.remove('show');
+    };
+  </script>
+</body>
+</html>

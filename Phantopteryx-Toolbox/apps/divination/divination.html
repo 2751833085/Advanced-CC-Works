@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Divination · Phantopteryx Toolbox</title>
+  <link rel="stylesheet" href="../image-editor/styles/editor.css">
+  <link rel="stylesheet" href="styles/divination-layout.css">
+</head>
+<body class="div-app" data-tab="ziwei">
+  <div class="editor-root">
+    <div class="editor-main">
+      <div class="bar ich-main-bar">
+        <a href="../../toolbox.html" class="top-link ich-bar-back" title="回到开始页 · Back to start">Back to Start Page</a>
+        <span id="divBarStatus" class="bar-dims ich-bar-title" aria-live="polite">Zi Wei · Chart (紫微斗数 · 命盘)</span>
+      </div>
+      <div class="canvas-wrap">
+        <div class="canvas-area div-canvas" tabindex="0">
+          <div class="div-work-scroll">
+            <p class="div-disclaimer">For entertainment and cultural reference only. （仅供娱乐与文化参考。） Layout mirrors the Image Editor shell: left — Gregorian inputs; center — tool dock; right — chart / hexagram on white. Sidebar and dock stay dark.（三栏与 Image Editor 一致：左公历、中 dock、右白底命盘／卦象；侧栏与 dock 黑底，与主编辑器画布极性对调。）</p>
+            <div id="tabZiwei" class="tab-canvas" data-panel="ziwei">
+              <div id="zwPan" class="zw-pan"></div>
+              <section id="zwNotes" class="zw-notes zw-interpreter ich-interpreter" aria-labelledby="zwNotesHeading">
+                <h3 id="zwNotesHeading" class="zw-notes-title ich-inter-title">&#9679; Chart AI Assistant（命盘助手）</h3>
+                <p class="zw-notes-lead meta">Local-only mode: load the browser model first, then run chart. Analysis uses <strong>宫位象意 + 地支五行 + 命身/时辰</strong>; AI follows the <strong>星曜 / 四化 / 大限·流年</strong> reasoning frame for <strong>人格模型 + 事件概率</strong> language without inventing stars.（仅本地模式：先加载本地模型再排盘。）</p>
+                <div id="zwAnalysis" class="ich-analysis"></div>
+                <details class="ich-api-details zw-local-panel">
+                  <summary>Browser local model (experimental)（浏览器本地小模型）</summary>
+                  <p class="meta">Uses <code>@xenova/transformers</code> via CDN (ESM). First run downloads quantized <strong>DistilGPT-2</strong> (~80MB+), runs in WASM/WebGPU-capable browsers. Output is <strong>English demo text</strong>, not a classical Zi Wei–trained model. Requires HTTPS or localhost.（首次需下载权重；非专业紫微语料。）</p>
+                  <p class="meta">Fully private inference stays on device; no server except CDN for files.（推理在本地，仅拉取模型文件。）</p>
+                  <div class="div-side-actions">
+                    <button type="button" id="zwLoadLocalModel">Reload DistilGPT-2 (demo)</button>
+                  </div>
+                  <p id="zwLocalModelStatus" class="meta zw-local-status" aria-live="polite"></p>
+                </details>
+                <div id="zwChatLog" class="ich-chat-log" aria-live="polite"></div>
+                <div class="ich-presets" id="zwPresetRow"></div>
+              </section>
+            </div>
+            <div id="tabIching" class="tab-canvas" data-panel="iching" hidden>
+              <div id="ichIdleState" class="ich-idle-state" aria-live="polite">
+                <p class="ich-idle-title">Not started <span class="ich-idle-zh">（未开始）</span></p>
+                <p class="ich-idle-sub">Please generate a hexagram first. In the center <strong>Hex</strong> panel, use <strong>Cast next line</strong> six times (bottom to top) or <strong>Quick cast</strong> once.（请先生成卦象：在中间 Hex 区掷六次线或快捷起卦一次。）</p>
+              </div>
+              <div class="toss-log" id="tossLog" aria-live="polite"></div>
+              <div class="hex-block">
+                <div id="hexMain"></div>
+                <div id="hexChanged" hidden></div>
+              </div>
+              <section id="ichInterpreter" class="ich-interpreter" hidden>
+                <h3 class="ich-inter-title">Hexagram notes <span class="ich-inter-zh">（卦象解析）</span></h3>
+                <div id="ichAnalysis" class="ich-analysis"></div>
+                <details class="ich-api-details">
+                  <summary>Compatible API (Optional · Local Key Storage)（连接兼容 API（可选），密钥仅存本机）</summary>
+                  <p class="meta">OpenAI-compatible base URL, model, and API key are saved only in your browser’s localStorage. Use a CORS-safe proxy if needed.（填写兼容接口；模型与密钥仅写入 localStorage。）</p>
+                  <div class="div-field"><label>Base URL</label><input type="text" id="ichApiBase" placeholder="https://api.openai.com" autocomplete="off"></div>
+                  <div class="div-field"><label>Model</label><input type="text" id="ichApiModel" placeholder="gpt-4o-mini" autocomplete="off"></div>
+                  <div class="div-field"><label>API Key</label><input type="password" id="ichApiKey" placeholder="sk-…" autocomplete="off"></div>
+                  <div class="div-side-actions">
+                    <button type="button" id="ichApiSave">Save（保存）</button>
+                    <button type="button" id="ichApiClear">Clear（清除）</button>
+                  </div>
+                </details>
+                <div id="ichChatLog" class="ich-chat-log" aria-live="polite"></div>
+                <div class="ich-presets" id="ichPresetRow"></div>
+                <div class="ich-compose">
+                  <textarea id="ichCustomQ" rows="2" placeholder="Type a question and send…（输入问题后发送…）"></textarea>
+                  <button type="button" id="ichSendCustom">Send（发送）</button>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="tool-sidebar" aria-hidden="false">
+      <div class="tool-flyout tool-flyout--docked">
+        <div class="tool-flyout-head">
+          <span id="sidebarTitle">Solar · time</span>
+        </div>
+        <div class="panels">
+          <div id="sidebarZw" class="div-panel">
+            <p class="tool-panel-intro-summary">Gregorian birth date and hour (0–23). Lunar conversion uses <code>vendor/lunar.js</code>.（公历出生时刻；农历由 lunar 换算。）</p>
+            <div class="div-field"><label>Year</label><input type="number" id="zwYear" min="1900" max="2100" value="2000"></div>
+            <div class="div-field"><label>Month</label><input type="number" id="zwMonth" min="1" max="12" value="6"></div>
+            <div class="div-field"><label>Day</label><input type="number" id="zwDay" min="1" max="31" value="15"></div>
+            <div class="div-field"><label>Hour</label><input type="number" id="zwHour" min="0" max="23" value="12"></div>
+            <div class="div-field"><label>Gender</label><select id="zwGender"><option value="男">Male (男)</option><option value="女">Female (女)</option></select></div>
+            <div class="div-side-actions">
+              <button type="button" id="btnZiWei">Run Chart（排盘）</button>
+            </div>
+            <div class="div-sidebar-tutorial" lang="en" aria-label="Zi Wei module guide">
+              <h4 class="ich-tutorial-h">What this is</h4>
+              <p class="ich-tutorial-p"><strong>Zi Wei Dou Shu (紫微斗数)</strong> here is a learning-oriented <strong>chart shell</strong>: solar → lunar, Life / Body palaces, twelve houses on branches — not a commercial fortune engine.</p>
+              <h4 class="ich-tutorial-h">What you can do</h4>
+              <ul class="ich-tutorial-ul">
+                <li>Enter Gregorian date and hour, then <strong>Run chart</strong> (or the dock <strong>Chart</strong> tile).</li>
+                <li>Read the summary lines and the 4×3 palace grid on the white panel.</li>
+                <li>Scroll for <strong>Chart AI assistant</strong> below the grid: auto summary, chat, and browser local demo model.</li>
+                <li>Switch to <strong>I Ching (易经)</strong> for coin hexagrams and hexagram chat.</li>
+              </ul>
+              <h4 class="ich-tutorial-h">Steps</h4>
+              <ol class="ich-tutorial-ol">
+                <li>Keep <strong>Zi Wei (紫微)</strong> selected in <strong>Module</strong>.</li>
+                <li>Adjust Year / Month / Day / Hour, then <strong>Run chart</strong>.</li>
+                <li>Scroll down for the <strong>Chart AI assistant</strong>; use <strong>Back to Start Page</strong> to exit.</li>
+              </ol>
+            </div>
+          </div>
+          <div id="sidebarYi" class="div-panel" hidden>
+            <p class="tool-panel-intro-summary">I Ching: cast coins and reset in the center <strong>Hex</strong> panel. Solar note uses the fields below.（易经掷钱与重置在 Hex；简批用下列公历。）</p>
+            <div class="div-field"><label>Year</label><input type="number" id="birthYear" min="1900" max="2100" value="2000"></div>
+            <div class="div-field"><label>Month</label><input type="number" id="birthMonth" min="1" max="12" value="6"></div>
+            <div class="div-field"><label>Day</label><input type="number" id="birthDay" min="1" max="31" value="15"></div>
+            <div class="div-field"><label>Hour</label><input type="number" id="birthHour" min="0" max="23" value="12"></div>
+            <div class="div-side-actions">
+              <button type="button" id="btnBirth">Solar note</button>
+            </div>
+            <div class="birth-out" id="birthOut"></div>
+            <div class="ich-sidebar-tutorial" lang="en" aria-label="I Ching module guide">
+              <h4 class="ich-tutorial-h">What this is</h4>
+              <p class="ich-tutorial-p">This panel is the <strong>I Ching (Book of Changes)</strong> corner of the divination toolbox: you cast six lines (like three-coin throws) to get a hexagram, optional changing lines, and a short reading.</p>
+              <h4 class="ich-tutorial-h">What you can do</h4>
+              <ul class="ich-tutorial-ul">
+                <li>Build a hexagram line by line or in one tap (quick cast).</li>
+                <li>See the main hexagram, moving lines, and the changed hexagram when applicable.</li>
+                <li>Read the built-in analysis and chat with preset prompts or your own question (offline templates, or an optional compatible API).</li>
+                <li>Use the date fields above for a light <strong>Solar / calendar</strong> side note (zodiac sign, Western constellation, traditional double-hour branch)—for fun, not a full chart.</li>
+              </ul>
+              <h4 class="ich-tutorial-h">Steps</h4>
+              <ol class="ich-tutorial-ol">
+                <li>Select <strong>I Ching (易经)</strong> in the middle <strong>Module</strong> row so <strong>Hex</strong> appears.</li>
+                <li>In <strong>Hex</strong>, press <strong>Quick cast</strong> for six lines at once, or <strong>Cast next line</strong> six times (bottom → top).</li>
+                <li>Read the cards on the right; scroll to <strong>Hexagram notes (卦象解析)</strong>, presets, and custom chat.</li>
+                <li><strong>Reset</strong> clears everything. <strong>Back to Start Page</strong> returns to the main toolbox.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <aside class="editor-dock" id="divDock">
+      <div class="dock-main-col">
+        <div class="dock-body">
+          <div class="sheet" id="sheetDivTools">
+            <div class="tool-strip vis">
+              <div class="tools-scroll">
+                <section class="tools-section">
+                  <div class="tools-section-bar">
+                    <h3 class="tools-section-title">Module</h3>
+                  </div>
+                  <div class="tools-grid">
+                    <div class="tools-cell on" data-tab-cell="ziwei">
+                      <button type="button" class="tools-tile ts-main tab-btn" data-tab="ziwei">Zi Wei (紫微)</button>
+                    </div>
+                    <div class="tools-cell ts-cell--disabled" data-tab-cell="iching">
+                      <button type="button" class="tools-tile ts-main" disabled title="Not completed / 未完成">I Ching (易经) · Not completed（未完成）</button>
+                    </div>
+                    <div class="tools-cell ts-cell--disabled dock-zw-only">
+                      <button type="button" class="tools-tile ts-main" disabled title="Later · 大限">Decade luck</button>
+                    </div>
+                    <div class="tools-cell ts-cell--disabled dock-zw-only">
+                      <button type="button" class="tools-tile ts-main" disabled title="Later · 四化">Four transforms</button>
+                    </div>
+                  </div>
+                </section>
+                <section class="tools-section dock-iching-only">
+                  <div class="tools-section-bar">
+                    <h3 class="tools-section-title">Hex</h3>
+                  </div>
+                  <div class="tools-grid div-tools-grid--flat">
+                    <div class="tools-cell">
+                      <button type="button" class="tools-tile ts-main" id="btnToss" title="掷下一爻">Cast next line</button>
+                    </div>
+                    <div class="tools-cell">
+                      <button type="button" class="tools-tile ts-main" id="btnQuick" title="快捷起卦">Quick cast</button>
+                    </div>
+                    <div class="tools-cell">
+                      <button type="button" class="tools-tile ts-main" id="btnReset" title="重置">Reset</button>
+                    </div>
+                  </div>
+                </section>
+                <section class="tools-section dock-zw-only">
+                  <div class="tools-section-bar">
+                    <h3 class="tools-section-title">Chart</h3>
+                  </div>
+                  <div class="tools-grid div-tools-grid--flat">
+                    <div class="tools-cell">
+                      <button type="button" class="tools-tile ts-main" id="dockBtnZwRun" title="排盘">Run Chart（排盘）</button>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+          <div class="sheet" id="sheetDivRefs" hidden>
+            <div class="tool-strip vis">
+              <div class="tools-scroll">
+                <p class="fav-hint">Hexagram table: see README. Lunar: lunar-javascript. Optional notes: <code>data/tianji-yi.json</code>.（卦表与农历来源见 README；天纪向占位见 data/tianji-yi.json。）</p>
+                <p class="style-menu-hint">Major stars not wired yet; intercalary month uses MVP rules.（十四正曜未接入；闰月按 MVP 规则。）</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="dock-nav" id="divDockNav">
+          <button type="button" class="dock-nav-btn on" data-div-dock="tools">Tools</button>
+          <button type="button" class="dock-nav-btn" data-div-dock="refs">Refs</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script src="vendor/lunar.js"></script>
+  <script src="../../node_modules/iztro/dist/iztro.min.js"></script>
+  <script src="scripts/iching/iching-data.js"></script>
+  <script src="scripts/core/calendar.js"></script>
+  <script src="scripts/ziwei/ziwei-engine.js"></script>
+  <script src="scripts/ziwei/ziwei-analyst.js"></script>
+  <script src="scripts/iching/tianji-yi-loader.js"></script>
+  <script src="scripts/ziwei/ziwei.js"></script>
+  <script src="scripts/iching/iching.js"></script>
+  <script src="scripts/iching/iching-interpreter.js"></script>
+  <script src="scripts/core/app.js"></script>
+  <div class="viewport-blocked-overlay div-viewport-blocked-overlay" id="viewportBlockedOverlay" hidden aria-hidden="true" role="alertdialog" aria-modal="true" aria-labelledby="viewportBlockedTitle">
+    <div class="viewport-blocked-card div-viewport-blocked-card">
+      <div class="viewport-blocked-icon" aria-hidden="true">
+        <svg class="viewport-blocked-svg" viewBox="0 0 96 96" width="96" height="96" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="28" y="14" width="40" height="68" rx="8" stroke="currentColor" stroke-width="4"/>
+          <line x1="40" y1="24" x2="56" y2="24" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+          <line x1="20" y1="18" x2="76" y2="78" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <p class="viewport-blocked-title" id="viewportBlockedTitle">This interface has not been adapted for mobile yet and cannot be used.</p>
+      <p class="viewport-blocked-hint">Resize the window to a wide layout (at least 900px wide) to continue.</p>
+    </div>
+  </div>
+  <script src="scripts/core/divination-viewport-gate.js"></script>
+</body>
+</html>
