@@ -150,7 +150,14 @@
   </style>
 </head>
 <body>
-    <script src="../../../loading-particle.js"></script>
+    <script>
+        (() => {
+            const script = document.createElement("script");
+            script.async = false;
+            script.src = "../../../loading-particle.js";
+            document.currentScript.replaceWith(script);
+        })();
+    </script>
   <main>
     <h1>Digital Divination Demo</h1>
     <p>This compact version preserves the interaction idea from the original toolbox without carrying the full astrology and I Ching engines inside the portfolio source.</p>

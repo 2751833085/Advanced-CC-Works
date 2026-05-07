@@ -207,7 +207,14 @@
   </style>
 </head>
 <body>
-    <script src="../../../loading-particle.js"></script>
+    <script>
+        (() => {
+            const script = document.createElement("script");
+            script.async = false;
+            script.src = "../../../loading-particle.js";
+            document.currentScript.replaceWith(script);
+        })();
+    </script>
   <aside>
     <h1>Image Editor Demo</h1>
     <p class="hint">Open an image and test a compact set of browser-native adjustments.</p>

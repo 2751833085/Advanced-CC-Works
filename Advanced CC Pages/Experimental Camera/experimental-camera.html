@@ -7,7 +7,14 @@
     <link rel="stylesheet" href="experimental-camera.css">
 </head>
 <body>
-    <script src="../../loading-particle.js"></script>
+    <script>
+        (() => {
+            const script = document.createElement("script");
+            script.async = false;
+            script.src = "../../loading-particle.js";
+            document.currentScript.replaceWith(script);
+        })();
+    </script>
     <button class="back" type="button" data-route="../advanced-cc.html">← Back</button>
     <h1>III. Experimental <u>Camera</u></h1>
     <p class="intro">Design and create an experimental camera with a specific purpose or usage in mind.</p>

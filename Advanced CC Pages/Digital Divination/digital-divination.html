@@ -7,11 +7,21 @@
     <link rel="stylesheet" href="digital-divination.css">
 </head>
 <body>
-    <script src="../../loading-particle.js"></script>
+    <script>
+        (() => {
+            const script = document.createElement("script");
+            script.async = false;
+            script.src = "../../loading-particle.js";
+            document.currentScript.replaceWith(script);
+        })();
+    </script>
     <button class="back" type="button" data-route="../advanced-cc.html">← Back</button>
     <h1>V. Digital <u>Divination</u></h1>
     <p class="intro">A rebuilt version of Phantopteryx Toolbox by Oneiron, made for Firebase and focused on browser-based image editing.</p>
-    <a class="launch-btn final-project-link" href="https://phantopteryx-toolbox.web.app/" target="_blank" rel="noreferrer">Open Final Project -></a>
+    <div class="project-links" aria-label="Project links">
+        <button class="launch-btn" type="button" data-external="https://phantopteryx-toolbox.web.app/">Open Final Project -></button>
+        <button class="launch-btn secondary-link" type="button" data-external="https://github.com/2751833085/Phantopteryx-Toolbox-by-Oneiron">View GitHub -></button>
+    </div>
 
     <div class="content">
         <div class="project-copy">
@@ -66,6 +76,12 @@
                 });
             });
         })();
+
+        document.querySelectorAll("[data-external]").forEach(control => {
+            control.addEventListener("click", () => {
+                window.open(control.dataset.external, "_blank", "noopener");
+            });
+        });
     </script>
 </body>
 </html>

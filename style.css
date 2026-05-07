@@ -200,9 +200,54 @@ a,
     font-size: 1.7vw;
 }
 
-.about-link u {
+.text-route u,
+.quick-entry u {
+    position: relative;
+    display: inline-block;
+    padding-bottom: 0.03em;
     text-decoration: none;
-    border-bottom: 0.15vw solid #8B4513;
+    border-bottom: 0;
+}
+
+.text-route u::before,
+.text-route u::after,
+.quick-entry u::before,
+.quick-entry u::after {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    background: currentColor;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-size: 100% 100%;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: 100% 100%;
+    transform-origin: left center;
+}
+
+.text-route u::before,
+.quick-entry u::before {
+    left: 0.02em;
+    right: 0.02em;
+    bottom: -0.05em;
+    height: 0.14em;
+    opacity: 0.86;
+    transform: rotate(-0.8deg);
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 120 24' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 15 C16 10 27 17 40 13 C54 9 68 15 82 13 C94 11 106 17 116 12' fill='none' stroke='black' stroke-width='7.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 120 24' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 15 C16 10 27 17 40 13 C54 9 68 15 82 13 C94 11 106 17 116 12' fill='none' stroke='black' stroke-width='7.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.text-route u::after,
+.quick-entry u::after {
+    left: 0.08em;
+    right: 0;
+    bottom: -0.08em;
+    height: 0.1em;
+    opacity: 0.42;
+    transform: rotate(0.45deg) scaleY(0.72);
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 120 24' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 12 C21 16 33 11 47 14 C61 17 73 10 88 13 C101 16 111 12 116 15' fill='none' stroke='black' stroke-width='5.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 120 24' preserveAspectRatio='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 12 C21 16 33 11 47 14 C61 17 73 10 88 13 C101 16 111 12 116 15' fill='none' stroke='black' stroke-width='5.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
 .quick-note {
@@ -225,11 +270,6 @@ a,
     line-height: 1.05;
     text-align: left;
     cursor: pointer;
-}
-
-.quick-entry u {
-    text-decoration: none;
-    border-bottom: 0.13vw solid currentColor;
 }
 
 .mobile-home { display: none; }

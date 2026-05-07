@@ -7,7 +7,14 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <script src="loading-particle.js"></script>
+    <script>
+        (() => {
+            const script = document.createElement("script");
+            script.async = false;
+            script.src = "loading-particle.js";
+            document.currentScript.replaceWith(script);
+        })();
+    </script>
     <header class="topbar">
         <button class="brand" type="button" data-route="#">Muyi's Portfolio</button>
         <nav class="nav" aria-label="Main navigation">

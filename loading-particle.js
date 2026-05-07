@@ -1,6 +1,16 @@
 (() => {
   const root = document.documentElement;
 
+  const activateLoader = (loader) => {
+    if (!loader) {
+      return;
+    }
+    if (!loader.classList) {
+      return;
+    }
+    loader.classList.add("is-active");
+  };
+
   const isDarkSurface = location.pathname.includes("Phantopteryx-Toolbox");
   const theme = isDarkSurface
     ? {
@@ -244,7 +254,7 @@
 
     window.setTimeout(() => {
       requestAnimationFrame(() => {
-        loader.classList.add("is-active");
+        activateLoader(loader);
       });
     }, 180);
 

@@ -70,8 +70,15 @@
   </style>
 </head>
 <body>
-    <script src="../loading-particle.js"></script>
-  <button type="button" data-route="apps/image-editor/">Open Image Editor Demo</button>
+    <script>
+        (() => {
+            const script = document.createElement("script");
+            script.async = false;
+            script.src = "../loading-particle.js";
+            document.currentScript.replaceWith(script);
+        })();
+    </script>
+  <button type="button" data-route="apps/image-editor/index.html">Open Image Editor Demo</button>
   <script>
     const root = document.documentElement;
     const control = document.querySelector("[data-route]");

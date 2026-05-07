@@ -7,7 +7,14 @@
     <link rel="stylesheet" href="community-tool.css">
 </head>
 <body>
-    <script src="../../loading-particle.js"></script>
+    <script>
+        (() => {
+            const script = document.createElement("script");
+            script.async = false;
+            script.src = "../../loading-particle.js";
+            document.currentScript.replaceWith(script);
+        })();
+    </script>
     <button class="back" type="button" data-route="../advanced-cc.html">← Back</button>
     <h1>IV. Community <u>Tool</u></h1>
     <p class="intro">Build a community-facing digital tool and present it as part of your Advanced CC portfolio.</p>

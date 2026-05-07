@@ -177,7 +177,14 @@
   </style>
 </head>
 <body>
-    <script src="../loading-particle.js"></script>
+    <script>
+        (() => {
+            const script = document.createElement("script");
+            script.async = false;
+            script.src = "../loading-particle.js";
+            document.currentScript.replaceWith(script);
+        })();
+    </script>
   <main>
     <section class="intro">
       <span class="eyebrow">Community tool prototype</span>
@@ -185,7 +192,7 @@
       <p>Old community-tool prototype, preserved as a compact portfolio demo. The original research version combined image editing, divination, and optional AI services; this cleaned version keeps the public-facing navigation without carrying the experimental implementation as source noise.</p>
     </section>
     <nav aria-label="Toolbox demos">
-      <button class="tool-link" type="button" data-route="apps/image-editor/">Image Editor Demo<span>Brightness, contrast, saturation</span></button>
+      <button class="tool-link" type="button" data-route="apps/image-editor/index.html">Image Editor Demo<span>Brightness, contrast, saturation</span></button>
       <button class="tool-link" type="button" data-route="apps/divination/divination.html">Divination Demo<span>Draw a compact message</span></button>
       <button class="tool-link" type="button" data-route="../Advanced CC Pages/Community Tool/community-tool.html">Back to Project Page<span>Advanced CC archive</span></button>
     </nav>

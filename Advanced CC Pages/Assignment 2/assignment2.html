@@ -7,7 +7,14 @@
     <link rel="stylesheet" href="assignment2.css">
 </head>
 <body>
-    <script src="../../loading-particle.js"></script>
+    <script>
+        (() => {
+            const script = document.createElement("script");
+            script.async = false;
+            script.src = "../../loading-particle.js";
+            document.currentScript.replaceWith(script);
+        })();
+    </script>
     <button class="back" type="button" data-route="../advanced-cc.html">← Back</button>
     <h1>Assignment 2: Words in <u>Motion</u></h1>
     <p class="intro">A compact archive of three motion studies originally built in P5JS.</p>
