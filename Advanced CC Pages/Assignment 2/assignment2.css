@@ -162,6 +162,18 @@ h1 u::after {
     gap: clamp(18px, 2vw, 34px);
 }
 
+.grid {
+    margin-bottom: clamp(30px, 4vw, 72px);
+}
+
+.group-title {
+    display: inline-block;
+    margin: clamp(18px, 2.6vw, 44px) 0 clamp(16px, 1.8vw, 30px);
+    color: var(--brown);
+    font-size: clamp(38px, 3.8vw, 76px);
+    line-height: 1;
+}
+
 .content,
 .card,
 .logic-card {
@@ -247,7 +259,100 @@ h1 u::after {
     text-underline-offset: 0.16em;
 }
 
-.card iframe {
+.card h3 a {
+    color: var(--brown);
+    text-decoration: none;
+}
+
+.card h3 a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 0.1em;
+    text-underline-offset: 0.16em;
+}
+
+.iframe-wrapper {
+    position: relative;
+    display: grid;
+    place-items: stretch;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 8px;
+    background:
+        linear-gradient(135deg, rgba(139, 69, 19, 0.08), rgba(104, 119, 95, 0.08)),
+        rgba(255,255,255,0.45);
+}
+
+.iframe-wrapper iframe {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 600px;
+    height: 600px;
+    border: 0;
+    transform-origin: top left;
+}
+
+.sketch-load {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    place-content: center;
+    width: 100%;
+    border: 0;
+    color: var(--brown);
+    background:
+        linear-gradient(135deg, rgba(255, 252, 242, 0.92), rgba(246, 234, 205, 0.78)),
+        rgba(255, 252, 242, 0.84);
+    font: inherit;
+    font-size: clamp(26px, 2.3vw, 46px);
+    line-height: 1;
+    text-align: center;
+    cursor: pointer;
+}
+
+.sketch-load:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.15em;
+}
+
+.sketch-shell.is-loading .sketch-load::after {
+    content: "";
+    display: block;
+    width: 62%;
+    height: 0.12em;
+    margin: 0.32em auto 0;
+    border-radius: 999px;
+    background: currentColor;
+    opacity: 0.42;
+    animation: sketchLoadingLine 900ms ease-in-out infinite alternate;
+}
+
+.sketch-shell iframe {
+    opacity: 0;
+    transition: opacity 240ms ease;
+}
+
+.sketch-shell.is-loaded iframe {
+    opacity: 1;
+}
+
+.sketch-shell.is-loaded .sketch-load {
+    display: none;
+}
+
+@keyframes sketchLoadingLine {
+    from { transform: scaleX(0.35); }
+    to { transform: scaleX(1); }
+}
+
+.link-hint {
+    color: var(--muted);
+    font-size: clamp(17px, 1.15vw, 23px);
+}
+
+.card > iframe {
     width: 100%;
     aspect-ratio: 4 / 3;
     height: auto;
@@ -345,6 +450,15 @@ h1 u::after {
         gap: 14px;
     }
 
+    .grid {
+        margin-bottom: 28px;
+    }
+
+    .group-title {
+        margin: 26px 0 12px;
+        font-size: 40px;
+    }
+
     .card.wide { grid-column: auto; }
 
     .content,
@@ -371,7 +485,7 @@ h1 u::after {
         font-size: 17px;
     }
 
-    .card iframe {
+    .card > iframe {
         min-height: 320px;
     }
 
