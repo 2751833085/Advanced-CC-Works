@@ -1,26 +1,145 @@
-<html>
+<!DOCTYPE html>
+<html lang="en" class="is-loading">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Muyi's Portfolio</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <img class="drawing" src="RES/Drawing.png">
-    
+    <script src="loading-particle.js"></script>
+    <header class="topbar">
+        <button class="brand" type="button" data-route="#">Muyi's Portfolio</button>
+        <nav class="nav" aria-label="Main navigation">
+            <button type="button" data-route="#">Home</button>
+            <button type="button" data-route="About Me Page/about.html">About Me</button>
+            <button type="button" data-route="CC-Lab Pages/cc-lab.html">CC-Lab Works</button>
+            <button type="button" data-route="Advanced CC Pages/advanced-cc.html">Advanced CC</button>
+        </nav>
+    </header>
+
+    <main class="mobile-home" aria-label="Mobile portfolio home">
+        <header class="mobile-bar">
+            <strong class="mobile-brand">Muyi</strong>
+            <span>Portfolio</span>
+        </header>
+
+        <div class="mobile-stack">
+            <section class="mobile-panel hero">
+                <div>
+                    <span class="mobile-kicker">Critical Computation archive</span>
+                    <h1><span class="outline">Welcome</span><br>from Muyi</h1>
+                </div>
+                <p>A compact mobile doorway into CC Lab works, Advanced CC studies, and small experimental tools.</p>
+                <div class="mobile-actions">
+                    <button class="mobile-link" type="button" data-route="About Me Page/about.html"><span>About Me<small>profile and process</small></span></button>
+                    <button class="mobile-link" type="button" data-route="Advanced CC Pages/advanced-cc.html"><span>Browse Works<small>course archive</small></span></button>
+                </div>
+            </section>
+
+            <section class="mobile-card">
+                <span class="mobile-eyebrow">Course paths</span>
+                <h2>Works</h2>
+                <div class="mobile-grid">
+                    <button class="mobile-link" type="button" data-route="CC-Lab Pages/cc-lab.html"><span>CC-Lab Works<small>early P5JS archive</small></span></button>
+                    <button class="mobile-link" type="button" data-route="Advanced CC Pages/advanced-cc.html"><span>Advanced CC Works<small>HTML, CSS, JavaScript, API</small></span></button>
+                </div>
+            </section>
+
+            <section class="mobile-card alt">
+                <span class="mobile-eyebrow">Little doors</span>
+                <h2>Try</h2>
+                <div class="mobile-grid">
+                    <button class="mobile-link" type="button" data-route="Advanced CC Pages/Digital Divination/digital-divination.html"><span>Final Project<small>Digital Divination detail</small></span></button>
+                    <button class="mobile-link" type="button" data-route="Advanced CC Pages/Digital Divination/digital-divination.html"><span>Digital Divination<small>message and interpretation</small></span></button>
+                    <button class="mobile-link" type="button" data-route="Advanced CC Pages/Experimental Camera/experimental-camera.html"><span>Experimental Camera<small>camera interface study</small></span></button>
+                    <button class="mobile-link" type="button" data-route="Advanced CC Pages/Community Tool/community-tool.html"><span>Community Tool<small>toolbox prototype</small></span></button>
+                </div>
+            </section>
+
+            <section class="mobile-card note">
+                <span class="mobile-eyebrow">Advanced CC</span>
+                <h2>Thanks</h2>
+                <p>This year's course helped me learn practical skills around HTML, CSS, JavaScript, and API-based projects. I am grateful to Matías Piña Aguilera for his continuous support and guidance.</p>
+            </section>
+        </div>
+    </main>
+
+    <img class="drawing" data-src="RES/Drawing.png" alt="">
+
     <div class="text1">
         <h1><span class="outline">Welcome from</span><br>Muyi</h1>
         <p>Welcome to the CC Lab Final homepage. This is a demonstration page that shows all my works in Critical Computation classes.</p>
         <p>This website mainly summarizes all the P5JS tasks I completed last year (almost the year before). I divided them into two parts on average, corresponding to last year's CC and this year's Advanced-CC. CC showcases five works of various sizes and scopes that I completed using P5JS over a period last year, hoping that the new content this year can further enhance my programming skills.</p>
-        <a href="About Me Page/about.html" class="about-link">About <u>Me</u> -></a>
+        <button class="about-link text-route" type="button" data-route="About Me Page/about.html">About <u>Me</u> -></button>
     </div>
 
     <div class="text2">
-        <a href="CC-Lab Pages/cc-lab.html">CC-Lab<br><u>Works</u> -></a>
+        <button class="text-route" type="button" data-route="CC-Lab Pages/cc-lab.html">CC-Lab<br><u>Works</u> -></button>
         <p>The tasks related to CC-Lab have been a year ago. I learned a lot back then. I had a basic understanding of P5JS and HTML (now I've almost forgotten everything). The content back then was divided into five chapters, corresponding to five works. I don't remember the specific details, but I luckily saved a lot of content, and there will be more information on the subpages.</p>
     </div>
 
-    <div class="text3">
-        <a href="Advanced CC Pages/advanced-cc.html" class="title">Advanced CC<br><u>Works</u> -></a>
-        <p>Still Constructing</p>
+    <div class="quick-entry" aria-label="Quick project entries">
+        <span class="quick-note">little doors to try</span>
+        <button type="button" data-route="Advanced CC Pages/Digital Divination/digital-divination.html">Final <u>Project</u> -></button>
+        <button type="button" data-route="Advanced CC Pages/Digital Divination/digital-divination.html">Digital <u>Divination</u> -></button>
+        <button type="button" data-route="Advanced CC Pages/Experimental Camera/experimental-camera.html">Experimental <u>Camera</u> -></button>
+        <button type="button" data-route="Advanced CC Pages/Community Tool/community-tool.html">Community <u>Tool</u> -></button>
     </div>
+
+    <div class="text3">
+        <button class="title text-route" type="button" data-route="Advanced CC Pages/advanced-cc.html">Advanced CC<br><u>Works</u> -></button>
+        <p>The work related to Advanced CC comes from this year's course. I learned a lot through the class, especially many practical skills around HTML, CSS, JavaScript, and API-based projects. I am also grateful to Matías Piña Aguilera for his continuous support, guidance, and encouragement throughout the semester.</p>
+    </div>
+
+    <script>
+        (() => {
+            const root = document.documentElement;
+            const assets = ["RES/Drawing.png"];
+
+            const loadImage = src => new Promise(resolve => {
+                const image = new Image();
+                image.onload = resolve;
+                image.onerror = resolve;
+                image.src = src;
+                if (image.complete) resolve();
+            });
+
+            const fontReady = document.fonts ? document.fonts.ready.catch(() => {}) : Promise.resolve();
+            const pageReady = new Promise(resolve => {
+                if (document.readyState === "complete") {
+                    resolve();
+                } else {
+                    window.addEventListener("load", resolve, { once: true });
+                }
+            });
+            const minimumHold = new Promise(resolve => setTimeout(resolve, 1200));
+            const maxHold = new Promise(resolve => setTimeout(resolve, 4200));
+            const ready = Promise.all([...assets.map(loadImage), fontReady, pageReady, minimumHold]);
+            const revealImages = () => {
+                document.querySelectorAll("img[data-src]").forEach(image => {
+                    image.src = image.dataset.src;
+                });
+            };
+
+            Promise.race([ready, maxHold]).then(() => {
+                revealImages();
+                requestAnimationFrame(() => {
+                    if (window.finishLoadingScreen) {
+                        window.finishLoadingScreen();
+                    } else {
+                        root.classList.remove("is-loading");
+                        root.classList.add("is-ready");
+                    }
+                });
+            });
+
+            document.querySelectorAll("[data-route]").forEach(control => {
+                control.addEventListener("click", () => {
+                    location.href = control.dataset.route;
+                });
+            });
+        })();
+    </script>
 </body>
 </html>

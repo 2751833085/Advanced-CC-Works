@@ -1,17 +1,52 @@
-<html>
+<!DOCTYPE html>
+<html lang="en" class="is-loading">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Experimental Camera - Advanced CC</title>
     <link rel="stylesheet" href="experimental-camera.css">
 </head>
 <body>
-    <a href="../advanced-cc.html" class="back">← Back</a>
-    <h1>III. <u>Experimental Camera</u></h1>
+    <script src="../../loading-particle.js"></script>
+    <button class="back" type="button" data-route="../advanced-cc.html">← Back</button>
+    <h1>III. Experimental <u>Camera</u></h1>
     <p class="intro">Design and create an experimental camera with a specific purpose or usage in mind.</p>
 
     <div class="content">
-        <p class="placeholder">Retro Soviet EL surveillance interface with hand-tracked interaction.</p>
-        <a class="launch-btn" href="project/index.html">Open Project Fullscreen</a>
+        <p class="placeholder">Retro Soviet EL surveillance interface with hand-tracked interaction. The original prototype used camera input, hand detection, and low-resolution visual processing to turn the browser into a fictional monitoring device.</p>
+        <p class="placeholder">For the cleaned portfolio source, the implementation is archived as a concept summary so the site stays lightweight and structurally readable.</p>
     </div>
+    <script>
+        (() => {
+            const root = document.documentElement;
+            const loadImage = src => new Promise(resolve => {
+                const image = new Image();
+                image.onload = resolve;
+                image.onerror = resolve;
+                image.src = src;
+                if (image.complete) resolve();
+            });
+            const imageSources = Array.from(document.querySelectorAll("img[data-src]")).map(image => image.dataset.src).filter(Boolean);
+            const fontReady = document.fonts ? document.fonts.ready.catch(() => {}) : Promise.resolve();
+            const pageReady = document.readyState === "complete" ? Promise.resolve() : new Promise(resolve => window.addEventListener("load", resolve, { once: true }));
+            const minimumHold = new Promise(resolve => setTimeout(resolve, 1200));
+            const maxHold = new Promise(resolve => setTimeout(resolve, 4200));
+            const ready = Promise.all([...imageSources.map(loadImage), fontReady, pageReady, minimumHold]);
+
+            Promise.race([ready, maxHold]).then(() => {
+                document.querySelectorAll("[data-src]").forEach(node => {
+                    node.src = node.dataset.src;
+                });
+                requestAnimationFrame(() => {
+                    if (window.finishLoadingScreen) {
+                        window.finishLoadingScreen();
+                    } else {
+                        root.classList.remove("is-loading");
+                        root.classList.add("is-ready");
+                    }
+                });
+            });
+        })();
+    </script>
 </body>
 </html>

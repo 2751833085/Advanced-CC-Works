@@ -1,621 +1,277 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="is-loading">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Image Editor</title>
-  <link rel="stylesheet" href="styles/editor.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Image Editor Demo</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    :root {
+      --bg: #050505;
+      --panel: #101010;
+      --line: #303030;
+      --text: #f4f4f4;
+      --muted: #aaa;
+      --accent: #f4ead8;
+    }
+
+    html.is-loading::before {
+    content: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    background: transparent;
+    pointer-events: none;
+}
+
+    html.is-loading::after {
+      content: none;
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      color: var(--accent);
+      font: 0.9rem ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      grid-template-columns: minmax(18rem, 24rem) 1fr;
+      color: var(--text);
+      background: var(--bg);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    html.is-loading body {
+    overflow: hidden;
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    animation: none;
+}
+
+    aside,
+    main {
+      padding: clamp(16px, 2vw, 28px);
+      opacity: 0;
+      transform: translateY(18px);
+      animation: toolIn 720ms ease-out 120ms forwards;
+    }
+
+    html.is-loading aside,
+    html.is-loading main {
+      visibility: hidden;
+      opacity: 0;
+      animation: none;
+    }
+
+    @keyframes toolIn {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    aside {
+      display: grid;
+      align-content: start;
+      gap: 16px;
+      border-right: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--text);
+      font-size: clamp(1.4rem, 4vw, 3rem);
+      line-height: 1;
+      font-weight: 400;
+    }
+
+    .hint {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .controls {
+      display: grid;
+      gap: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.2;
+      text-transform: uppercase;
+    }
+
+    input {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    button {
+      min-height: 44px;
+      color: var(--text);
+      background: #141414;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    button:hover {
+      background: var(--accent);
+      color: #000;
+    }
+
+    main {
+      display: grid;
+      place-items: center;
+      background:
+        linear-gradient(45deg, #111 25%, transparent 25%),
+        linear-gradient(-45deg, #111 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #111 75%),
+        linear-gradient(-45deg, transparent 75%, #111 75%),
+        #151515;
+      background-size: 24px 24px;
+      background-position: 0 0, 0 12px, 12px -12px, -12px 0;
+    }
+
+    .stage {
+      width: min(900px, 100%);
+      min-height: min(70vh, 680px);
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(5, 5, 5, 0.65);
+    }
+
+    img {
+      max-width: 86%;
+      max-height: 74vh;
+      object-fit: contain;
+      filter: brightness(var(--brightness, 1)) contrast(var(--contrast, 1)) saturate(var(--saturation, 1));
+    }
+
+    .empty {
+      margin: 0;
+      color: #777;
+      text-align: center;
+    }
+
+    @media (max-width: 760px) {
+      body {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
+      main {
+        min-height: 58vh;
+      }
+
+      .stage {
+        min-height: 52vh;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      aside,
+      main {
+        opacity: 1;
+        transform: none;
+        animation: none;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div class="editor-root">
-    <div class="editor-main">
-      <div class="bar">
-        <span id="info" class="bar-dims" aria-live="off">Open an image first</span>
-        <a href="../../toolbox.html" class="top-link" title="Back">Back</a>
-        <button type="button" id="btnRestart" title="Restart">Restart</button>
-        <button type="button" id="btnStacks" title="Edit Stacks">Stacks</button>
-        <span class="spacer"></span>
-        <button id="btnUndo" disabled title="Undo (⌘Z)">Undo</button>
-        <button id="btnRedo" disabled title="Redo (⌘⇧Z)">Redo</button>
-        <button type="button" id="btnFramePreview" disabled title="White outline around image (preview only, does not modify pixels)">Bounds</button>
-      </div>
-
-      <div class="canvas-wrap">
-        <div class="canvas-area" id="area" tabindex="0">
-          <div class="drop" id="drop" role="button" tabindex="0" aria-label="Upload image">
-            <div class="drop-title">Drop image here</div>
-            <div class="drop-sub">or click to upload</div>
-          </div>
-          <div class="canvas-scale-wrap" id="canvasScaleWrap">
-            <div class="canvas-surface" id="canvasSurface">
-              <canvas id="c"></canvas>
-            </div>
-            <div class="frame-preview-hint" id="framePreviewHint" hidden aria-live="polite">Image bounds — preview only</div>
-            <div class="ai-busy" id="aiBusy" hidden aria-hidden="true">
-              <div class="ai-busy-inner">
-                <div class="ai-busy-label" id="aiBusyLabel">Processing…</div>
-                <div class="ai-busy-track" role="progressbar" aria-valuetext="Processing">
-                  <div class="ai-busy-bar"></div>
-                </div>
-                <button type="button" id="aiBusyRetry" class="ai-busy-retry" hidden>Retry AI server</button>
-              </div>
-            </div>
-          </div>
-          <div class="compare-hint" aria-hidden="true">Hold Space to compare original · Scroll wheel to fine-tune</div>
-          <div class="ai-boot-banner" id="aiBootBanner" hidden aria-hidden="true">
-            <div class="ai-boot-banner-text" id="aiBootBannerText"></div>
-            <button type="button" class="ai-boot-banner-retry" id="aiBootBannerRetry" hidden>Retry AI server</button>
-          </div>
-
-          <div class="tune-layer" id="tuneLayer" aria-hidden="true">
-            <div class="tune-gesture-pad" id="tuneGesturePad" hidden></div>
-            <div class="tune-param-menu" id="tuneParamMenu"></div>
-            <div class="tune-hud">
-              <div class="tune-value" id="tuneValueDisp">0</div>
-              <div class="tune-arc-wrap"><canvas id="tuneArc" width="320" height="112"></canvas></div>
-              <div class="tune-param-pill" id="tuneParamPill">Brightness</div>
-              <div class="tune-hint">Drag horizontally: value · vertically: switch parameter · tap pill for list</div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <script src="../../../loading-particle.js"></script>
+  <aside>
+    <h1>Image Editor Demo</h1>
+    <p class="hint">Open an image and test a compact set of browser-native adjustments.</p>
+    <div class="controls">
+      <label>Open image <input id="file" type="file" accept="image/*"></label>
+      <label>Brightness <input data-filter="brightness" type="range" min="50" max="150" value="100"></label>
+      <label>Contrast <input data-filter="contrast" type="range" min="50" max="150" value="100"></label>
+      <label>Saturation <input data-filter="saturation" type="range" min="0" max="200" value="100"></label>
     </div>
-
-    <aside class="editor-dock" id="editorDock">
-      <div class="dock-main-col">
-        <div class="dock-body">
-          <div class="sheet" id="sheetExport" hidden>
-            <p class="export-hint">⌘O Open · ⌘S Export PNG</p>
-            <div class="export-actions">
-              <button type="button" id="bo">Open Image</button>
-              <button type="button" id="bp" disabled>Export PNG</button>
-              <button type="button" id="bj" disabled>Export JPG</button>
-            </div>
-          </div>
-          <div class="sheet" id="sheetStyles" hidden>
-            <div class="style-menu-grid" id="styleMenuGrid"></div>
-            <p class="fav-hint style-menu-hint">Pick a tile above; the left panel shows the same tool until you close it.</p>
-          </div>
-          <div class="sheet" id="sheetTools">
-            <div class="tool-strip vis" id="toolStrip">
-              <div class="tools-handle" aria-hidden="true"></div>
-              <div class="tools-scroll">
-                <section class="tools-section">
-                  <div class="tools-section-bar">
-                    <h3 class="tools-section-title">Adjustments &amp; Corrections</h3>
-                  </div>
-                  <div class="tools-grid">
-                    <div class="tools-cell ts-cell" data-t="adjust">
-                      <button type="button" class="tools-tile ts-main" data-t="adjust" title="Tune Image" aria-label="Tune Image">
-                        <svg class="ts-ico" viewBox="0 0 24 24" aria-hidden="true"><line x1="3" y1="8" x2="21" y2="8"/><line x1="3" y1="16" x2="21" y2="16"/><circle cx="10" cy="8" r="2"/><circle cx="14" cy="16" r="2"/></svg>
-                        <span class="tools-label">Tune Image</span>
-                      </button>
-                    </div>
-                    <div class="tools-cell ts-cell" data-t="detail">
-                      <button type="button" class="tools-tile ts-main" data-t="detail" title="Details" aria-label="Details">
-                        <svg class="ts-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18 L9 9 L14 14 L20 5"/><circle cx="20" cy="5" r="1.8"/></svg>
-                        <span class="tools-label">Details</span>
-                      </button>
-                    </div>
-                    <div class="tools-cell ts-cell" data-t="tone">
-                      <button type="button" class="tools-tile ts-main" data-t="tone" title="Tone" aria-label="Tone">
-                        <svg class="ts-ico" viewBox="0 0 24 24" aria-hidden="true"><line x1="6" y1="18" x2="6" y2="7"/><line x1="12" y1="18" x2="12" y2="4"/><line x1="18" y1="18" x2="18" y2="10"/></svg>
-                        <span class="tools-label">Tone</span>
-                      </button>
-                    </div>
-                    <div class="tools-cell ts-cell" data-t="curves">
-                      <button type="button" class="tools-tile ts-main" data-t="curves" title="Curves" aria-label="Curves">
-                        <svg class="ts-ico" viewBox="0 0 24 24" aria-hidden="true"><polyline points="3,18 8,18 12,10 16,6 21,4"/><line x1="3" y1="3" x2="3" y2="21"/><line x1="3" y1="21" x2="21" y2="21"/></svg>
-                        <span class="tools-label">Curves</span>
-                      </button>
-                    </div>
-                    <div class="tools-cell ts-cell" data-t="wb">
-                      <button type="button" class="tools-tile ts-main" data-t="wb" title="White Balance"><svg class="ts-ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16"/></svg><span class="tools-label">White Balance</span></button>
-                    </div>
-                    <div class="tools-cell ts-cell" data-t="invert">
-                      <button type="button" class="tools-tile ts-main" data-t="invert" title="Invert / restore (no panel)"><svg class="ts-ico" viewBox="0 0 24 24"><path d="M12 3v18"/><circle cx="9" cy="9" r="5"/><circle cx="15" cy="15" r="5"/></svg><span class="tools-label">Invert</span></button>
-                    </div>
-                    <div class="tools-cell ts-cell" data-t="grayscale">
-                      <button type="button" class="tools-tile ts-main" data-t="grayscale" title="Grayscale"><svg class="ts-ico" viewBox="0 0 24 24"><rect x="4" y="6" width="6" height="12"/><rect x="14" y="6" width="6" height="12" opacity=".4"/></svg><span class="tools-label">Grayscale</span></button>
-                    </div>
-                    <div class="tools-cell ts-cell ts-cell--disabled" data-t="rawmode">
-                      <button type="button" class="tools-tile ts-main" data-t="rawmode" disabled aria-disabled="true" aria-pressed="false" aria-label="RAW mode" title="Open a camera RAW file (.dng, .cr2, .nef, …) to enable">
-                        <svg class="ts-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" fill="none" stroke="currentColor"/><circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/></svg>
-                        <span class="tools-label">RAW</span>
-                      </button>
-                    </div>
-                  </div>
-                </section>
-                <section class="tools-section">
-                  <div class="tools-section-bar"><h3 class="tools-section-title">Styles &amp; Effects</h3></div>
-                  <div class="tools-grid">
-                    <div class="tools-cell ts-cell" data-t="vignette"><button type="button" class="tools-tile ts-main" data-t="vignette"><svg class="ts-ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor"/></svg><span class="tools-label">Vignette</span></button></div>
-                    <div class="tools-cell ts-cell" data-t="lensblur"><button type="button" class="tools-tile ts-main" data-t="lensblur"><svg class="ts-ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9" opacity=".35"/></svg><span class="tools-label">Lens Blur</span></button></div>
-                    <div class="tools-cell ts-cell" data-t="glamour"><button type="button" class="tools-tile ts-main" data-t="glamour"><svg class="ts-ico" viewBox="0 0 24 24"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z"/></svg><span class="tools-label">Glamour Glow</span></button></div>
-                    <div class="tools-cell ts-cell" data-t="tonalcontrast"><button type="button" class="tools-tile ts-main" data-t="tonalcontrast"><svg class="ts-ico" viewBox="0 0 24 24"><path d="M4 16 L8 8 L12 14 L16 6 L20 12"/></svg><span class="tools-label">Tonal Contrast</span></button></div>
-                    <div class="tools-cell ts-cell" data-t="hdr"><button type="button" class="tools-tile ts-main" data-t="hdr"><svg class="ts-ico" viewBox="0 0 24 24"><path d="M4 18 L8 10 L12 16 L16 8 L20 14"/></svg><span class="tools-label">HDR Scape</span></button></div>
-                    <div class="tools-cell ts-cell" data-t="drama"><button type="button" class="tools-tile ts-main" data-t="drama"><svg class="ts-ico" viewBox="0 0 24 24"><path d="M6 18 L12 4 L18 18 Z"/></svg><span class="tools-label">Drama</span></button></div>
-                    <div class="tools-cell ts-cell" data-t="vintage"><button type="button" class="tools-tile ts-main" data-t="vintage"><svg class="ts-ico" viewBox="0 0 24 24"><rect x="5" y="7" width="14" height="10" rx="1"/></svg><span class="tools-label">Vintage</span></button></div>
-                    <div class="tools-cell ts-cell" data-t="grain"><button type="button" class="tools-tile ts-main" data-t="grain"><svg class="ts-ico" viewBox="0 0 24 24"><path d="M4 4h2v2H4zm4 4h2v2H8zm4-4h2v2h-2zm4 4h2v2h-2zm4-4h2v2h-2z"/></svg><span class="tools-label">Grain</span></button></div>
-                    <div class="tools-cell ts-cell" data-t="retrolux"><button type="button" class="tools-tile ts-main" data-t="retrolux"><svg class="ts-ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><line x1="4" y1="4" x2="20" y2="20"/></svg><span class="tools-label">Retrolux</span></button></div>
-                    <div class="tools-cell ts-cell" data-t="noir"><button type="button" class="tools-tile ts-main" data-t="noir"><svg class="ts-ico" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14"/></svg><span class="tools-label">Noir</span></button></div>
-                    <div class="tools-cell ts-cell" data-t="bw"><button type="button" class="tools-tile ts-main" data-t="bw"><svg class="ts-ico" viewBox="0 0 24 24"><path d="M12 3 L18 21 H6 Z"/></svg><span class="tools-label">Black &amp; White</span></button></div>
-                    <div class="tools-cell ts-cell" data-t="frames"><button type="button" class="tools-tile ts-main" data-t="frames"><svg class="ts-ico" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" fill="none" stroke-width="2"/></svg><span class="tools-label">Frames</span></button></div>
-                  </div>
-                </section>
-                <section class="tools-section">
-                  <div class="tools-section-bar">
-                    <h3 class="tools-section-title">Retouching &amp; Transform</h3>
-                  </div>
-                  <div class="tools-grid">
-                    <div class="tools-cell ts-cell" data-t="crop">
-                      <button type="button" class="tools-tile ts-main" data-t="crop" title="Crop" aria-label="Crop">
-                        <svg class="ts-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>
-                        <span class="tools-label">Crop</span>
-                      </button>
-                    </div>
-                    <div class="tools-cell ts-cell" data-t="persp">
-                      <button type="button" class="tools-tile ts-main" data-t="persp" title="Perspective" aria-label="Perspective">
-                        <svg class="ts-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7 L19 5 L17 17 L7 17 Z"/><line x1="5" y1="7" x2="17" y2="17"/><line x1="19" y1="5" x2="7" y2="17"/></svg>
-                        <span class="tools-label">Perspective</span>
-                      </button>
-                    </div>
-                    <div class="tools-cell ts-cell" data-t="brush"><button type="button" class="tools-tile ts-main" data-t="brush"><svg class="ts-ico" viewBox="0 0 24 24"><path d="M3 21 L14 10 L18 14 L7 25 Z"/><path d="M14 10 L19 5"/></svg><span class="tools-label">Brush</span></button></div>
-                    <div class="tools-cell ts-cell" data-t="selective"><button type="button" class="tools-tile ts-main" data-t="selective"><svg class="ts-ico" viewBox="0 0 24 24"><circle cx="12" cy="10" r="4"/><circle cx="12" cy="10" r="8" fill="none"/></svg><span class="tools-label">Selective</span></button></div>
-                    <div class="tools-cell ts-cell" data-t="heal"><button type="button" class="tools-tile ts-main" data-t="heal"><svg class="ts-ico" viewBox="0 0 24 24"><path d="M12 21a8 8 0 0 0 0-16v4a4 4 0 0 1 0 8"/></svg><span class="tools-label">Healing</span></button></div>
-                    <div class="tools-cell ts-cell" data-t="text"><button type="button" class="tools-tile ts-main" data-t="text"><svg class="ts-ico" viewBox="0 0 24 24"><path d="M6 4h12M12 4v16"/></svg><span class="tools-label">Text</span></button></div>
-                    <div class="tools-cell ts-cell" data-t="double"><button type="button" class="tools-tile ts-main" data-t="double"><svg class="ts-ico" viewBox="0 0 24 24"><rect x="4" y="6" width="10" height="10" opacity=".6"/><rect x="10" y="8" width="10" height="10"/></svg><span class="tools-label">Double Exposure</span></button></div>
-                    <div class="tools-cell ts-cell" data-t="expand"><button type="button" class="tools-tile ts-main" data-t="expand"><svg class="ts-ico" viewBox="0 0 24 24"><path d="M8 8h8v8H8z"/><path d="M4 4v4M4 4h4M20 4h-4M20 4v4M20 20v-4M20 20h-4M4 20h4M4 20v-4"/></svg><span class="tools-label">Expand</span></button></div>
-                  </div>
-                </section>
-                <section class="tools-section">
-                  <div class="tools-section-bar"><h3 class="tools-section-title">AI Tools</h3></div>
-                  <div class="tools-grid">
-                    <div class="tools-cell ts-cell" data-t="aienhance"><button type="button" class="tools-tile ts-main" data-t="aienhance"><svg class="ts-ico" viewBox="0 0 24 24"><path d="M12 2 L14 9 L22 12 L14 15 L12 22 L10 15 L2 12 L10 9 Z"/></svg><span class="tools-label">AI Enhance</span></button></div>
-                    <div class="tools-cell ts-cell" data-t="aiexpand"><button type="button" class="tools-tile ts-main" data-t="aiexpand"><svg class="ts-ico" viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg><span class="tools-label">AI Expand</span></button></div>
-                    <div class="tools-cell ts-cell" data-t="airemove"><button type="button" class="tools-tile ts-main" data-t="airemove"><svg class="ts-ico" viewBox="0 0 24 24"><path d="M5 7h14M9 7V5h6v2M8 7l1 12h6l1-12"/></svg><span class="tools-label">Remove Object</span></button></div>
-                    <div class="tools-cell ts-cell" data-t="aibg"><button type="button" class="tools-tile ts-main" data-t="aibg"><svg class="ts-ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><path d="M12 5v14"/></svg><span class="tools-label">Remove BG</span></button></div>
-                    <div class="tools-cell ts-cell" data-t="aistyle"><button type="button" class="tools-tile ts-main" data-t="aistyle"><svg class="ts-ico" viewBox="0 0 24 24"><path d="M3 17c4-5 7-7 10-7s5 2 8 7"/><path d="M6 7h12"/></svg><span class="tools-label">Style Transfer</span></button></div>
-                  </div>
-                </section>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="dock-nav" id="dockNav">
-          <button type="button" class="dock-nav-btn" data-dock="styles">Tools</button>
-          <button type="button" class="dock-nav-btn on" data-dock="tools">Image Editing</button>
-          <button type="button" class="dock-nav-btn" data-dock="export">Export</button>
-        </div>
-      </div>
-    </aside>
-
-    <aside class="tool-sidebar" id="toolSidebar" aria-hidden="false">
-      <div class="tool-sidebar-empty" id="toolSidebarEmpty">Select a tool to see its controls</div>
-      <div class="tool-flyout tool-flyout--docked" id="toolFlyout" aria-hidden="true">
-        <div class="tool-flyout-head">
-          <span id="flyoutTitle"></span>
-          <button type="button" id="flyoutClose" title="Close">×</button>
-        </div>
-        <div class="panels" id="panels">
-
-            <div class="panel" id="p-adjust">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Brightness</span><input type="range" min="-100" max="100" value="0" data-k="brightness"><span class="v">0</span></div>
-              <div class="sr"><span>Contrast</span><input type="range" min="-100" max="100" value="0" data-k="contrast"><span class="v">0</span></div>
-              <div class="sr"><span>Saturation</span><input type="range" min="-100" max="100" value="0" data-k="saturation"><span class="v">0</span></div>
-              <div class="sr"><span>Ambiance</span><input type="range" min="-100" max="100" value="0" data-k="ambiance"><span class="v">0</span></div>
-              <div class="sr"><span>Highlights</span><input type="range" min="-100" max="100" value="0" data-k="highlights"><span class="v">0</span></div>
-              <div class="sr"><span>Shadows</span><input type="range" min="-100" max="100" value="0" data-k="shadows"><span class="v">0</span></div>
-              <div class="sr"><span>Warmth</span><input type="range" min="-100" max="100" value="0" data-k="warmth"><span class="v">0</span></div>
-            </div>
-
-            <div class="panel" id="p-detail">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Structure</span><input type="range" min="0" max="100" value="0" data-k="structure"><span class="v">0</span></div>
-              <div class="sr"><span>Sharpening</span><input type="range" min="0" max="100" value="0" data-k="sharpening"><span class="v">0</span></div>
-              <div class="sr"><span>Softening</span><input type="range" min="0" max="100" value="0" data-k="softening"><span class="v">0</span></div>
-            </div>
-
-            <div class="panel" id="p-tone">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>High Tone</span><input type="range" min="-100" max="100" value="0" data-k="high"><span class="v">0</span></div>
-              <div class="sr"><span>Mid Tone</span><input type="range" min="-100" max="100" value="0" data-k="mid"><span class="v">0</span></div>
-              <div class="sr"><span>Low Tone</span><input type="range" min="-100" max="100" value="0" data-k="low"><span class="v">0</span></div>
-              <div class="sr"><span>Protect Highlights</span><input type="range" min="0" max="100" value="0" data-k="protHi"><span class="v">0</span></div>
-              <div class="sr"><span>Protect Shadows</span><input type="range" min="0" max="100" value="0" data-k="protSh"><span class="v">0</span></div>
-            </div>
-
-            <div class="panel" id="p-curves">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="brow">
-                <button class="ch-btn on" data-ch="rgb">RGB</button>
-                <button class="ch-btn" data-ch="r">R</button>
-                <button class="ch-btn" data-ch="g">G</button>
-                <button class="ch-btn" data-ch="b">B</button>
-              </div>
-              <canvas id="curveC" width="220" height="150"></canvas>
-              <div style="font-size:10px;color:#555;margin-top:4px;text-align:center">Click to add point · Right-click to remove · Drag to move</div>
-            </div>
-
-            <div class="panel" id="p-crop">
-              <div class="pbar"><button class="apply-btn">Crop</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="brow">
-                <button id="mirrorH">Mirror H</button>
-                <button id="mirrorV">Mirror V</button>
-                <button id="rot45">45°</button>
-              </div>
-              <div class="sr"><span>Rotate</span><input type="range" min="-45" max="45" value="0" data-k="cropRotate"><span class="v">0</span></div>
-              <div class="brow">
-                <button class="rat-btn on" data-r="free">Free</button>
-                <button class="rat-btn" data-r="orig">Original</button>
-                <button class="rat-btn" data-r="1:1">1:1</button>
-                <button class="rat-btn" data-r="din">DIN</button>
-                <button class="rat-btn" data-r="4:5">4:5</button>
-                <button class="rat-btn" data-r="5:4">5:4</button>
-                <button class="rat-btn" data-r="3:4">3:4</button>
-                <button class="rat-btn" data-r="4:3">4:3</button>
-                <button class="rat-btn" data-r="5:7">5:7</button>
-                <button class="rat-btn" data-r="7:5">7:5</button>
-                <button class="rat-btn" data-r="2:3">2:3</button>
-                <button class="rat-btn" data-r="3:2">3:2</button>
-                <button class="rat-btn" data-r="3:5">3:5</button>
-                <button class="rat-btn" data-r="9:16">9:16</button>
-                <button class="rat-btn" data-r="16:9">16:9</button>
-              </div>
-            </div>
-
-            <div class="panel panel-persp-live" id="p-persp">
-              <div class="pbar"><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="brow">
-                <button class="pm-btn on" data-pm="tilt">Tilt</button>
-                <button class="pm-btn" data-pm="rotate">Rotate</button>
-                <button class="pm-btn" data-pm="scale">Scale</button>
-                <button class="pm-btn" data-pm="free">Free</button>
-              </div>
-              <div id="perspCtrl">
-                <div class="sr"><span>Tilt H</span><input type="range" min="-100" max="100" value="0" data-k="tiltH"><span class="v">0</span></div>
-                <div class="sr"><span>Tilt V</span><input type="range" min="-100" max="100" value="0" data-k="tiltV"><span class="v">0</span></div>
-              </div>
-              <div class="brow" style="margin-top:6px">
-                <span style="color:#555;font-size:10px">Fill:</span>
-                <button class="fill-btn on" data-f="black">Black</button>
-                <button class="fill-btn" data-f="white">White</button>
-                <button class="fill-btn" data-f="none">None</button>
-                <button class="fill-btn" data-f="auto">Auto Fill</button>
-              </div>
-              <div class="persp-preview-block aiexpand-diagram-wrap" aria-label="Perspective preview">
-                <div class="aiexpand-meta" style="margin-bottom:8px">
-                  <div class="aiexpand-meta-row">
-                    <span class="aiexpand-meta-label">Source</span>
-                    <span id="perspPreviewSrc" class="aiexpand-meta-val">—</span>
-                  </div>
-                  <div class="aiexpand-meta-row">
-                    <span class="aiexpand-meta-label">Fill mode</span>
-                    <span id="perspPreviewFill" class="aiexpand-meta-val">—</span>
-                  </div>
-                </div>
-                <div class="aiexpand-diagram persp-preview-diagram" id="perspPreviewFrame">
-                  <canvas id="perspPanelThumb" class="persp-panel-thumb" width="1" height="1"></canvas>
-                </div>
-                <div class="aiexpand-out-row">
-                  <span class="aiexpand-meta-label">Canvas</span>
-                  <span id="perspPreviewCanvasRes" class="aiexpand-out-res">— × —</span>
-                </div>
-              </div>
-              <p class="export-hint persp-preview-hint">Sidebar preview matches the main canvas. Warp and Auto Fill save automatically after a short pause (no Apply). Use Reset / Cancel as needed.</p>
-            </div>
-
-            <div class="panel" id="p-wb">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Temperature</span><input type="range" min="-100" max="100" value="0" data-k="temp"><span class="v">0</span></div>
-              <div class="sr"><span>Tint</span><input type="range" min="-100" max="100" value="0" data-k="tint"><span class="v">0</span></div>
-            </div>
-            <div class="panel" id="p-grayscale">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Mix</span><input type="range" min="0" max="100" value="0" data-k="mix"><span class="v">0</span></div>
-              <p class="export-hint">0% = original; drag Mix to preview, Apply to commit.</p>
-            </div>
-            <div class="panel" id="p-vignette">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Strength</span><input type="range" min="0" max="100" value="0" data-k="strength"><span class="v">0</span></div>
-              <div class="sr"><span>Feather</span><input type="range" min="0" max="100" value="0" data-k="feather"><span class="v">0</span></div>
-            </div>
-            <div class="panel" id="p-lensblur">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Blur</span><input type="range" min="0" max="100" value="0" data-k="blur"><span class="v">0</span></div>
-              <div class="sr"><span>Transition</span><input type="range" min="0" max="100" value="0" data-k="transition"><span class="v">0</span></div>
-            </div>
-            <div class="panel" id="p-glamour">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Glow</span><input type="range" min="0" max="100" value="0" data-k="glow"><span class="v">0</span></div>
-            </div>
-            <div class="panel" id="p-tonalcontrast">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Amount</span><input type="range" min="0" max="100" value="0" data-k="amt"><span class="v">0</span></div>
-            </div>
-            <div class="panel" id="p-hdr">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Strength</span><input type="range" min="0" max="100" value="0" data-k="strength"><span class="v">0</span></div>
-            </div>
-            <div class="panel" id="p-drama">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Strength</span><input type="range" min="0" max="100" value="0" data-k="strength"><span class="v">0</span></div>
-            </div>
-            <div class="panel" id="p-vintage">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Strength</span><input type="range" min="0" max="100" value="0" data-k="strength"><span class="v">0</span></div>
-            </div>
-            <div class="panel" id="p-grain">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Grain</span><input type="range" min="0" max="100" value="0" data-k="amt"><span class="v">0</span></div>
-            </div>
-            <div class="panel" id="p-retrolux">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Strength</span><input type="range" min="0" max="100" value="0" data-k="strength"><span class="v">0</span></div>
-            </div>
-            <div class="panel" id="p-noir">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Contrast</span><input type="range" min="0" max="100" value="0" data-k="contrast"><span class="v">0</span></div>
-            </div>
-            <div class="panel" id="p-bw">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Red</span><input type="range" min="0" max="100" value="0" data-k="r"><span class="v">0</span></div>
-              <div class="sr"><span>Green</span><input type="range" min="0" max="100" value="0" data-k="g"><span class="v">0</span></div>
-              <div class="sr"><span>Blue</span><input type="range" min="0" max="100" value="0" data-k="b"><span class="v">0</span></div>
-            </div>
-            <div class="panel" id="p-frames">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Width</span><input type="range" min="0" max="20" value="0" data-k="width"><span class="v">0</span></div>
-            </div>
-            <div class="panel" id="p-styleDither">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="tool-style-progress" hidden data-style-progress="p-styleDither" aria-hidden="true">
-                <div class="tool-style-progress-track"><div class="tool-style-progress-fill" style="width:0%"></div></div>
-                <div class="tool-style-progress-text">Processing…</div>
-              </div>
-              <div class="brow">
-                <button type="button" class="bayer-size-btn on" data-bayer-size="4">4×4</button>
-                <button type="button" class="bayer-size-btn" data-bayer-size="8">8×8</button>
-              </div>
-              <div class="brow">
-                <button type="button" class="dither-ch-btn on" data-dither-ch="0">RGB</button>
-                <button type="button" class="dither-ch-btn" data-dither-ch="1">Luma</button>
-              </div>
-              <div class="sr"><span>Levels</span><input type="range" min="2" max="16" value="8" data-k="levels"><span class="v">8</span></div>
-              <div class="sr"><span>Mix</span><input type="range" min="0" max="100" value="0" data-k="mix"><span class="v">0</span></div>
-              <div class="sr"><span>Gray mix</span><input type="range" min="0" max="100" value="0" data-k="grayMix"><span class="v">0</span></div>
-              <div class="sr"><span>Gamma</span><input type="range" min="-40" max="40" value="0" data-k="inputGamma"><span class="v">0</span></div>
-              <div class="sr"><span>Bias</span><input type="range" min="-20" max="20" value="0" data-k="bias"><span class="v">0</span></div>
-            </div>
-            <div class="panel" id="p-styleDigitiles">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="tool-style-progress" hidden data-style-progress="p-styleDigitiles" aria-hidden="true">
-                <div class="tool-style-progress-track"><div class="tool-style-progress-fill" style="width:0%"></div></div>
-                <div class="tool-style-progress-text">Processing…</div>
-              </div>
-              <div class="brow">
-                <button type="button" class="digitile-sample-btn on" data-digitile-sample="0">Average</button>
-                <button type="button" class="digitile-sample-btn" data-digitile-sample="1">Vivid</button>
-              </div>
-              <div class="sr"><span>Mix</span><input type="range" min="0" max="100" value="0" data-k="mix"><span class="v">0</span></div>
-              <div class="sr"><span>Tile size</span><input type="range" min="4" max="64" value="16" data-k="tile"><span class="v">16</span></div>
-              <div class="sr"><span>Gap</span><input type="range" min="0" max="40" value="0" data-k="gap"><span class="v">0</span></div>
-              <div class="sr"><span>Saturation</span><input type="range" min="0" max="200" value="100" data-k="satBoost"><span class="v">100</span></div>
-              <div class="sr"><span>Contrast</span><input type="range" min="0" max="100" value="0" data-k="tileContrast"><span class="v">0</span></div>
-            </div>
-            <div class="panel" id="p-styleStipple">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button type="button" class="stip-power-btn on" data-stip-power="0">Off</button><button type="button" class="stip-power-btn" data-stip-power="1">On</button><button class="cancel-btn">Cancel</button></div>
-              <div class="tool-style-progress" hidden data-style-progress="p-styleStipple" aria-hidden="true">
-                <div class="tool-style-progress-track"><div class="tool-style-progress-fill" style="width:0%"></div></div>
-                <div class="tool-style-progress-text">Processing…</div>
-              </div>
-              <div class="brow">
-                <button type="button" class="stip-pattern-btn on" data-stip-pattern="0">Stripes</button>
-                <button type="button" class="stip-pattern-btn" data-stip-pattern="1">Benday</button>
-              </div>
-              <div class="sr"><span>Cell size</span><input type="range" min="4" max="32" value="12" data-k="cell"><span class="v">12</span></div>
-              <div class="sr"><span>Blur</span><input type="range" min="0" max="20" value="0" data-k="blur"><span class="v">0</span></div>
-              <div class="sr"><span>Contrast</span><input type="range" min="0" max="100" value="50" data-k="contrast"><span class="v">50</span></div>
-              <div class="sr"><span>Threshold</span><input type="range" min="-50" max="50" value="0" data-k="threshShift"><span class="v">0</span></div>
-              <div class="sr"><span>Stripe angle</span><input type="range" min="0" max="89" value="0" data-k="stripeAngle"><span class="v">0</span></div>
-              <div class="sr"><span>Gamma</span><input type="range" min="-30" max="30" value="0" data-k="stipGamma"><span class="v">0</span></div>
-            </div>
-            <div class="panel" id="p-styleHalftone">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="tool-style-progress" hidden data-style-progress="p-styleHalftone" aria-hidden="true">
-                <div class="tool-style-progress-track"><div class="tool-style-progress-fill" style="width:0%"></div></div>
-                <div class="tool-style-progress-text">Processing…</div>
-              </div>
-              <div class="sr"><span>Mix</span><input type="range" min="0" max="100" value="0" data-k="mix"><span class="v">0</span></div>
-              <div class="sr"><span>Pitch</span><input type="range" min="4" max="32" value="10" data-k="pitch"><span class="v">10</span></div>
-              <div class="sr"><span>Angle</span><input type="range" min="0" max="90" value="15" data-k="angle"><span class="v">15</span></div>
-              <div class="sr"><span>Weight</span><input type="range" min="10" max="100" value="85" data-k="weight"><span class="v">85</span></div>
-              <div class="sr"><span>Paper</span><input type="range" min="200" max="255" value="255" data-k="paper"><span class="v">255</span></div>
-              <div class="sr"><span>Dot gain</span><input type="range" min="50" max="150" value="100" data-k="dotGain"><span class="v">100</span></div>
-              <div class="sr"><span>Luma gamma</span><input type="range" min="-25" max="25" value="0" data-k="htGamma"><span class="v">0</span></div>
-            </div>
-            <div class="panel" id="p-brush">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Brush Size</span><input type="range" min="4" max="120" value="28" data-k="size"><span class="v">28</span></div>
-              <div class="sr"><span>Exposure</span><input type="range" min="-100" max="100" value="0" data-k="exposure"><span class="v">0</span></div>
-              <p class="export-hint">Drag over the image to paint exposure.</p>
-            </div>
-            <div class="panel" id="p-selective">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Radius</span><input type="range" min="8" max="200" value="64" data-k="radius"><span class="v">64</span></div>
-              <div class="sr"><span>Brightness</span><input type="range" min="-100" max="100" value="0" data-k="brightness"><span class="v">0</span></div>
-              <div class="sr"><span>Contrast</span><input type="range" min="-100" max="100" value="0" data-k="contrast"><span class="v">0</span></div>
-              <div class="sr"><span>Saturation</span><input type="range" min="-100" max="100" value="0" data-k="saturation"><span class="v">0</span></div>
-              <p class="export-hint">Tap image to add a control point; drag to move it.</p>
-            </div>
-            <div class="panel" id="p-heal">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Radius</span><input type="range" min="4" max="80" value="16" data-k="radius"><span class="v">16</span></div>
-              <p class="export-hint">Alt/Option+click to set source, then click target to heal.</p>
-            </div>
-            <div class="panel" id="p-text">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="brow"><input type="text" id="textInput" placeholder="Enter text" style="flex:1;min-width:120px;background:#111;border:1px solid #444;color:#fff;padding:6px 8px;font-size:12px;"></div>
-              <div class="sr"><span>Size</span><input type="range" min="12" max="120" value="32" data-k="size"><span class="v">32</span></div>
-              <p class="export-hint">Click on the image to place text.</p>
-            </div>
-            <div class="panel" id="p-double">
-              <div class="pbar"><button type="button" id="btnPickSecond">Pick Second Image</button><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Opacity</span><input type="range" min="0" max="100" value="0" data-k="opacity"><span class="v">0</span></div>
-            </div>
-            <div class="panel panel-defer-apply" id="p-expand">
-              <div class="pbar"><button class="apply-btn">Apply</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Left</span><input type="range" min="0" max="30" value="0" data-k="left"><span class="v">0</span></div>
-              <div class="sr"><span>Right</span><input type="range" min="0" max="30" value="0" data-k="right"><span class="v">0</span></div>
-              <div class="sr"><span>Top</span><input type="range" min="0" max="30" value="0" data-k="top"><span class="v">0</span></div>
-              <div class="sr"><span>Bottom</span><input type="range" min="0" max="30" value="0" data-k="bottom"><span class="v">0</span></div>
-              <div class="brow">
-                <button type="button" class="expand-fill-btn on" data-ef="edge">Edge Stretch</button>
-                <button type="button" class="expand-fill-btn" data-ef="mirror">Mirror</button>
-                <button type="button" class="expand-fill-btn" data-ef="black">Black</button>
-                <button type="button" class="expand-fill-btn" data-ef="ai">AI Fill</button>
-              </div>
-            </div>
-            <div class="panel" id="p-aienhance">
-              <div class="pbar"><button class="apply-btn">Apply AI Enhance</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Strength</span><input type="range" min="0" max="100" value="0" data-k="strength"><span class="v">0</span></div>
-            </div>
-            <div class="panel panel-aiexpand-live" id="p-aiexpand">
-              <div class="pbar"><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="aiexpand-meta">
-                <div class="aiexpand-meta-row">
-                  <span class="aiexpand-meta-label">Source</span>
-                  <span id="aiexpandSrcSize" class="aiexpand-meta-val">—</span>
-                </div>
-                <div class="aiexpand-meta-row">
-                  <span class="aiexpand-meta-label">Aspect</span>
-                  <span id="aiexpandAspect" class="aiexpand-meta-val">—</span>
-                </div>
-              </div>
-              <div class="aiexpand-diagram-wrap" aria-hidden="true">
-                <div class="aiexpand-diagram" id="aiexpandDiagram">
-                  <div class="aiexpand-diagram-outer" id="aiexpandDiagramOuter">
-                    <div class="aiexpand-diagram-inner" id="aiexpandDiagramInner"></div>
-                  </div>
-                </div>
-                <div class="aiexpand-out-row">
-                  <span class="aiexpand-meta-label">Output size</span>
-                  <span id="aiexpandOutRes" class="aiexpand-out-res">— × —</span>
-                </div>
-              </div>
-              <div class="aiexpand-presets" role="group" aria-label="Expand region">
-                <button type="button" class="aiexpand-preset on" data-mode="all" title="All sides">All</button>
-                <button type="button" class="aiexpand-preset" data-mode="lr" title="Left and right">L+R</button>
-                <button type="button" class="aiexpand-preset" data-mode="tb" title="Top and bottom">T+B</button>
-                <button type="button" class="aiexpand-preset" data-mode="l" title="Left only">L</button>
-                <button type="button" class="aiexpand-preset" data-mode="r" title="Right only">R</button>
-                <button type="button" class="aiexpand-preset" data-mode="t" title="Top only">T</button>
-                <button type="button" class="aiexpand-preset" data-mode="b" title="Bottom only">B</button>
-              </div>
-              <div class="sr"><span>Amount</span><input type="range" min="0" max="35" value="0" data-k="amount"><span class="v">0</span></div>
-              <p class="export-hint aiexpand-hint">Padding is a percentage of image width (left/right) and height (top/bottom). The frame shows original pixels (inner) vs expanded canvas (outer). While this tool is open, the canvas sits on a checkerboard: each debounced <strong>preview</strong> (edge fill via the local server) is saved to the image automatically so you can close the flyout when done. No separate Apply step.</p>
-            </div>
-            <div class="panel panel-defer-apply" id="p-airemove">
-              <div class="pbar"><button class="apply-btn">Remove Object</button><button class="reset-btn">Clear Mask</button><button class="cancel-btn">Cancel</button></div>
-              <div class="sr"><span>Brush Size</span><input type="range" min="8" max="120" value="36" data-k="size"><span class="v">36</span></div>
-              <p class="export-hint">Paint over the area to remove, then click Remove Object.</p>
-            </div>
-            <div class="panel" id="p-aibg">
-              <div class="pbar"><button class="apply-btn">Remove Background</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <p class="export-hint">Uses a local model to cut out the subject, outputting a transparent background.</p>
-            </div>
-            <div class="panel" id="p-aistyle">
-              <div class="pbar"><button class="apply-btn">Apply Style</button><button class="reset-btn">Reset</button><button class="cancel-btn">Cancel</button></div>
-              <div class="brow">
-                <button type="button" class="ai-style-btn on" data-style="cinematic">Cinematic</button>
-                <button type="button" class="ai-style-btn" data-style="noir">Noir</button>
-                <button type="button" class="ai-style-btn" data-style="vintage">Vintage</button>
-                <button type="button" class="ai-style-btn" data-style="cartoon">Cartoon</button>
-              </div>
-              <div class="sr"><span>Strength</span><input type="range" min="0" max="100" value="0" data-k="strength"><span class="v">0</span></div>
-            </div>
-        </div>
-      </div>
-    </aside>
-  </div>
-
-  <div class="stack-modal" id="stackModal" aria-hidden="true">
-    <div class="stack-modal-backdrop" id="stackBackdrop"></div>
-    <div class="stack-modal-panel" role="dialog" aria-labelledby="stackTitle">
-      <div class="stack-head">
-        <span id="stackTitle">Edit History</span>
-        <button type="button" id="stackClose" class="btn-icon" title="Close">×</button>
-      </div>
-      <div class="stack-list" id="stackList"></div>
+    <div class="actions">
+      <button id="reset" type="button">Reset</button>
+      <button type="button" data-route="../../toolbox.html">Back</button>
     </div>
-  </div>
-
-  <div class="restart-modal" id="restartModal" aria-hidden="true">
-    <div class="restart-modal-backdrop" id="restartBackdrop"></div>
-    <div class="restart-modal-panel" role="dialog" aria-labelledby="restartTitle" aria-modal="true">
-      <div class="stack-head">
-        <span id="restartTitle">Restart</span>
-      </div>
-      <div class="restart-modal-body">
-        All current edits will be cleared. Are you sure you want to restart?
-      </div>
-      <div class="restart-modal-actions">
-        <button type="button" id="restartCancel">Cancel</button>
-        <button type="button" id="restartConfirm" class="on">Confirm Restart</button>
-      </div>
+  </aside>
+  <main>
+    <div class="stage">
+      <p class="empty" id="empty">Open an image to preview edits.</p>
+      <img id="preview" alt="Edited preview" hidden>
     </div>
-  </div>
+  </main>
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const fontReady = document.fonts ? document.fonts.ready.catch(() => {}) : Promise.resolve();
+      const pageReady = document.readyState === "complete" ? Promise.resolve() : new Promise(resolve => window.addEventListener("load", resolve, { once: true }));
+      const minimumHold = new Promise(resolve => setTimeout(resolve, 1200));
+      const maxHold = new Promise(resolve => setTimeout(resolve, 4200));
 
-  <div class="restart-modal" id="unsavedToolModal" aria-hidden="true">
-    <div class="restart-modal-backdrop" id="unsavedToolBackdrop"></div>
-    <div class="restart-modal-panel" role="dialog" aria-labelledby="unsavedToolTitle" aria-modal="true">
-      <div class="stack-head">
-        <span id="unsavedToolTitle">Apply current changes?</span>
-      </div>
-      <div class="restart-modal-body">
-        This tool has unsaved changes. Discard will revert to the state before you opened the tool; Save will commit the current preview to the image.
-      </div>
-      <div class="restart-modal-actions restart-modal-actions--triple">
-        <button type="button" id="unsavedToolDiscard">Discard</button>
-        <button type="button" id="unsavedToolContinue">Keep Editing</button>
-        <button type="button" id="unsavedToolSave" class="on">Save Changes</button>
-      </div>
-    </div>
-  </div>
+      Promise.race([Promise.all([fontReady, pageReady, minimumHold]), maxHold]).then(() => {
+        requestAnimationFrame(() => {
+          if (window.finishLoadingScreen) {
+                        window.finishLoadingScreen();
+                    } else {
+                        root.classList.remove("is-loading");
+                        root.classList.add("is-ready");
+                    }
+        });
+      });
+    })();
 
-  <div class="viewport-blocked-overlay" id="viewportBlockedOverlay" hidden aria-hidden="true" role="alertdialog" aria-modal="true" aria-labelledby="viewportBlockedTitle">
-    <div class="viewport-blocked-card">
-      <div class="viewport-blocked-icon" aria-hidden="true">
-        <svg class="viewport-blocked-svg" viewBox="0 0 96 96" width="96" height="96" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="30" y="14" width="36" height="62" rx="5" stroke="currentColor" stroke-width="2.5"/>
-          <line x1="18" y1="18" x2="78" y2="78" stroke="currentColor" stroke-width="3" stroke-linecap="square"/>
-          <path d="M42 22h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <p class="viewport-blocked-title" id="viewportBlockedTitle">This interface has not been adapted for mobile yet and cannot be used.</p>
-      <p class="viewport-blocked-hint">Resize the window to a wide layout (at least 900px wide) to continue.</p>
-    </div>
-  </div>
+    const preview = document.getElementById('preview');
+    const empty = document.getElementById('empty');
+    const controls = document.querySelectorAll('[data-filter]');
 
-  <input type="file" id="fi" accept="image/*,.3fr,.ari,.arw,.dng,.cr2,.cr3,.crw,.erf,.fff,.iiq,.k25,.kdc,.mdc,.mos,.mrw,.nef,.nrw,.orf,.pef,.ptx,.pxn,.r3d,.raf,.raw,.rwl,.rw2,.sr2,.srf,.srw,.x3f">
-  <input type="file" id="fiSecond" accept="image/*">
-  <!-- Load order: shell → app registry → color → transform → looks → io → expand → AI → chrome UI -->
-  <script src="scripts/shell/viewport-gate.js"></script>
-  <script src="scripts/app/core.js"></script>
-  <script src="scripts/color/filters.js"></script>
-  <script src="scripts/color/tune.js"></script>
-  <script src="scripts/color/curves.js"></script>
-  <script src="scripts/transform/crop.js"></script>
-  <script src="scripts/transform/persp.js"></script>
-  <script src="scripts/looks/looks.js"></script>
-  <script src="scripts/looks/style-effects.js"></script>
-  <script src="scripts/io/local.js"></script>
-  <script src="scripts/transform/expand.js"></script>
-  <script src="scripts/ai/ai-tools.js"></script>
-  <script src="scripts/chrome/stacks-ui.js"></script>
-  <script src="scripts/chrome/panel-intros.js"></script>
-  <script src="scripts/chrome/editor-ui.js"></script>
+    document.getElementById('file').addEventListener('change', event => {
+      const file = event.target.files[0];
+      if (!file) return;
+      preview.src = URL.createObjectURL(file);
+      preview.hidden = false;
+      empty.hidden = true;
+    });
+
+    controls.forEach(control => {
+      control.addEventListener('input', () => {
+        document.documentElement.style.setProperty(`--${control.dataset.filter}`, control.value / 100);
+      });
+    });
+
+    document.getElementById('reset').addEventListener('click', () => {
+      controls.forEach(control => {
+        control.value = 100;
+        document.documentElement.style.setProperty(`--${control.dataset.filter}`, 1);
+      });
+    });
+  </script>
 </body>
 </html>

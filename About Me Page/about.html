@@ -1,11 +1,14 @@
-<html>
+<!DOCTYPE html>
+<html lang="en" class="is-loading">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>About</title>
     <link rel="stylesheet" href="about.css">
 </head>
 <body>
-    <a href="../index.html" class="back">← Back</a>
+    <script src="../loading-particle.js"></script>
+    <button class="back" type="button" data-route="../index.html">← Back</button>
     <h1>About <u>Me</u></h1>
 
     <div class="grid">
@@ -41,5 +44,37 @@
             </p>
         </div>
     </div>
+    <script>
+        (() => {
+            const root = document.documentElement;
+            const loadImage = src => new Promise(resolve => {
+                const image = new Image();
+                image.onload = resolve;
+                image.onerror = resolve;
+                image.src = src;
+                if (image.complete) resolve();
+            });
+            const imageSources = Array.from(document.querySelectorAll("img[data-src]")).map(image => image.dataset.src).filter(Boolean);
+            const fontReady = document.fonts ? document.fonts.ready.catch(() => {}) : Promise.resolve();
+            const pageReady = document.readyState === "complete" ? Promise.resolve() : new Promise(resolve => window.addEventListener("load", resolve, { once: true }));
+            const minimumHold = new Promise(resolve => setTimeout(resolve, 1200));
+            const maxHold = new Promise(resolve => setTimeout(resolve, 4200));
+            const ready = Promise.all([...imageSources.map(loadImage), fontReady, pageReady, minimumHold]);
+
+            Promise.race([ready, maxHold]).then(() => {
+                document.querySelectorAll("[data-src]").forEach(node => {
+                    node.src = node.dataset.src;
+                });
+                requestAnimationFrame(() => {
+                    if (window.finishLoadingScreen) {
+                        window.finishLoadingScreen();
+                    } else {
+                        root.classList.remove("is-loading");
+                        root.classList.add("is-ready");
+                    }
+                });
+            });
+        })();
+    </script>
 </body>
 </html>

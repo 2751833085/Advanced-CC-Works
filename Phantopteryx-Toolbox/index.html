@@ -1,12 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="is-loading">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0;url=toolbox.html">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Phantopteryx Toolbox</title>
-  <link rel="canonical" href="toolbox.html">
+  <style>
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      color: #f4f4f4;
+      background: #050505;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    html.is-loading::before {
+    content: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    background: transparent;
+    pointer-events: none;
+}
+
+    html.is-loading::after {
+      content: none;
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      color: #f4ead8;
+      font: 0.9rem ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    html.is-loading body {
+    overflow: hidden;
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    animation: none;
+}
+
+    button {
+      color: inherit;
+      background: transparent;
+      border: 1px solid #333;
+      border-radius: 8px;
+      font: inherit;
+      padding: 1rem;
+      text-decoration: none;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(12px);
+      animation: toolIn 520ms ease-out forwards;
+    }
+
+    html.is-loading button {
+      visibility: hidden;
+      opacity: 0;
+      animation: none;
+    }
+
+    @keyframes toolIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body>
-  <p>Opening <a href="toolbox.html">toolbox.html</a>…</p>
+    <script src="../loading-particle.js"></script>
+  <button type="button" data-route="toolbox.html">Open Phantopteryx Toolbox</button>
+  <script>
+    const root = document.documentElement;
+    const control = document.querySelector("[data-route]");
+    const target = control.dataset.route;
+    control.addEventListener("click", () => {
+      location.href = target;
+    });
+    const pageReady = document.readyState === "complete" ? Promise.resolve() : new Promise(resolve => window.addEventListener("load", resolve, { once: true }));
+    const minimumHold = new Promise(resolve => setTimeout(resolve, 1200));
+    Promise.all([pageReady, minimumHold]).then(() => {
+      if (window.finishLoadingScreen) {
+                        window.finishLoadingScreen();
+                    } else {
+                        root.classList.remove("is-loading");
+                        root.classList.add("is-ready");
+                    }
+      setTimeout(() => location.replace(target), 2300);
+    });
+  </script>
 </body>
 </html>

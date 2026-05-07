@@ -1,11 +1,14 @@
-<html>
+<!DOCTYPE html>
+<html lang="en" class="is-loading">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CC-Lab Works</title>
     <link rel="stylesheet" href="cc-lab.css">
 </head>
 <body>
-    <a href="../index.html" class="back">← Back</a>
+    <script src="../loading-particle.js"></script>
+    <button class="back" type="button" data-route="../index.html">← Back</button>
     <h1>CC-Lab <u>Works</u></h1>
 
     <div class="grid">
@@ -13,36 +16,97 @@
         <div class="card">
             <h2>I. Dream</h2>
             <p>The first task was to use P5JS to make a lost item. I focused on a ring that falls into another world.</p>
-            <iframe src="https://editor.p5js.org/2751833085/full/utPwwLm01"></iframe>
+            <div class="sketch-shell" data-sketch-url="https://editor.p5js.org/2751833085/full/utPwwLm01" data-sketch-title="Dream P5JS sketch">
+                <button class="sketch-load" type="button" data-load-sketch>Click to Load</button>
+            </div>
         </div>
 
         <!-- Time -->
         <div class="card">
             <h2>II. Time</h2>
             <p>How to determine time? The best way is through the sun. I made a clock with the sun as the standard.</p>
-            <iframe src="https://editor.p5js.org/2751833085/full/Vjd9_N38J"></iframe>
+            <div class="sketch-shell" data-sketch-url="https://editor.p5js.org/2751833085/full/Vjd9_N38J" data-sketch-title="Time P5JS sketch">
+                <button class="sketch-load" type="button" data-load-sketch>Click to Load</button>
+            </div>
         </div>
 
         <!-- Identity -->
         <div class="card">
             <h2>III. Identity</h2>
             <p>My external identity is how I look. My inner identity is different - a puppet with soul and heart.</p>
-            <iframe src="https://editor.p5js.org/2751833085/full/-d7T7g-Lb"></iframe>
+            <div class="sketch-shell" data-sketch-url="https://editor.p5js.org/2751833085/full/-d7T7g-Lb" data-sketch-title="Identity P5JS sketch">
+                <button class="sketch-load" type="button" data-load-sketch>Click to Load</button>
+            </div>
         </div>
 
         <!-- Control -->
         <div class="card">
             <h2>IV. Control</h2>
             <p>I learned to control P5JS through mouse and keyboard. Created boats and airships with weather control.</p>
-            <iframe src="https://editor.p5js.org/2751833085/full/GexUgzVmm"></iframe>
+            <div class="sketch-shell" data-sketch-url="https://editor.p5js.org/2751833085/full/GexUgzVmm" data-sketch-title="Control P5JS sketch">
+                <button class="sketch-load" type="button" data-load-sketch>Click to Load</button>
+            </div>
         </div>
 
         <!-- Game -->
         <div class="card wide">
             <h2>V. Game</h2>
             <p>The final task - make a game. Blue beats red, simple as extinguishing fire with water. I intentionally added some interesting effects, such as showing the trajectory of enemies' bullets at the end of the level, but the incorrect arrangement limited the game's resolution. I hope future projects will be better.</p>
-            <iframe src="https://editor.p5js.org/2751833085/full/T9s76LVAD"></iframe>
+            <div class="sketch-shell" data-sketch-url="https://editor.p5js.org/2751833085/full/T9s76LVAD" data-sketch-title="Game P5JS sketch">
+                <button class="sketch-load" type="button" data-load-sketch>Click to Load</button>
+            </div>
         </div>
     </div>
+    <script>
+        (() => {
+            const root = document.documentElement;
+            const fontReady = document.fonts ? document.fonts.ready.catch(() => {}) : Promise.resolve();
+            const pageReady = document.readyState === "complete" ? Promise.resolve() : new Promise(resolve => window.addEventListener("load", resolve, { once: true }));
+            const minimumHold = new Promise(resolve => setTimeout(resolve, 1200));
+            const maxHold = new Promise(resolve => setTimeout(resolve, 4200));
+            const ready = Promise.all([fontReady, pageReady, minimumHold]);
+
+            Promise.race([ready, maxHold]).then(() => {
+                requestAnimationFrame(() => {
+                    if (window.finishLoadingScreen) {
+                        window.finishLoadingScreen();
+                    } else {
+                        root.classList.remove("is-loading");
+                        root.classList.add("is-ready");
+                    }
+                });
+            });
+        })();
+
+        document.querySelectorAll("[data-load-sketch]").forEach(button => {
+            button.addEventListener("click", () => {
+                const shell = button.closest(".sketch-shell");
+                if (!shell || shell.classList.contains("is-loaded") || shell.classList.contains("is-loading")) return;
+
+                const frame = document.createElement("iframe");
+                frame.className = "sketch-frame";
+                frame.title = shell.dataset.sketchTitle || "P5JS sketch";
+                frame.allow = "accelerometer; gyroscope; camera; microphone; fullscreen";
+                frame.allowFullscreen = true;
+                frame.loading = "eager";
+
+                shell.classList.add("is-loading");
+                shell.insertBefore(frame, button);
+
+                const reveal = () => {
+                    shell.classList.remove("is-loading");
+                    shell.classList.add("is-loaded");
+                };
+
+                frame.addEventListener("load", reveal, { once: true });
+                frame.addEventListener("error", reveal, { once: true });
+
+                requestAnimationFrame(() => {
+                    frame.src = shell.dataset.sketchUrl;
+                    window.setTimeout(reveal, 2600);
+                });
+            });
+        });
+    </script>
 </body>
 </html>

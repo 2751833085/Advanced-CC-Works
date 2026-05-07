@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" class="is-loading">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Digital Divination - Advanced CC</title>
+    <link rel="stylesheet" href="digital-divination.css">
+</head>
+<body>
+    <script src="../../loading-particle.js"></script>
+    <button class="back" type="button" data-route="../advanced-cc.html">← Back</button>
+    <h1>V. Digital <u>Divination</u></h1>
+    <p class="intro">A rebuilt version of Phantopteryx Toolbox by Oneiron, made for Firebase and focused on browser-based image editing.</p>
+    <a class="launch-btn final-project-link" href="https://phantopteryx-toolbox.web.app/" target="_blank" rel="noreferrer">Open Final Project -></a>
+
+    <div class="content">
+        <div class="project-copy">
+            <p><strong>Digital Divination</strong> grows out of the fourth project, the old Phantopteryx Toolbox. Instead of keeping the earlier toolbox as a loose collection of utilities, this new version rebuilds the idea into a more complete desktop-style image workspace.</p>
+            <p>The main application is an image editor with five library slots, non-destructive operation stacks, live preview, edit history, metadata panels, format/export views, and a professional adjustment area inspired by Lightroom-style workflows. The interface supports quick edits, pro controls, curves, local brush masks, preset import, and optional AI actions such as enhance, expand, background removal, and object removal.</p>
+            <p>The project was prepared for Firebase Hosting, so the build logic centers on a deployed single-page app rather than a local sketch link. For this portfolio page, I am showing the structure and process, with the live project available below.</p>
+        </div>
+
+        <figure class="preview">
+            <img data-src="preview.png" alt="Image editor demo artwork preview">
+            <figcaption>Demo image used while testing the editor pipeline and visual workflow.</figcaption>
+        </figure>
+
+        <div class="logic-grid">
+            <div class="logic-card">
+                <h2>From Old Tool to New Workspace</h2>
+                <p>Project IV explored the toolbox concept. Project V keeps that origin, then rebuilds the system around one stronger purpose: editing, organizing, and exporting images in the browser.</p>
+            </div>
+            <div class="logic-card">
+                <h2>Editing Logic</h2>
+                <p>Images move through import, slot storage, operation stacks, preview rendering, history, metadata, and export. The edits are stored as instructions, so the source image can stay intact while the preview updates.</p>
+            </div>
+            <div class="logic-card">
+                <h2>Optional AI Layer</h2>
+                <p>AI tools are treated as optional services. The frontend can call a local FastAPI server for long tasks, while the Firebase-facing interface remains focused on the browser editing experience.</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        (() => {
+            const root = document.documentElement;
+            const deferredReady = Array.from(document.querySelectorAll("[data-src]")).map(node => new Promise(resolve => {
+                node.addEventListener("load", resolve, { once: true });
+                node.addEventListener("error", resolve, { once: true });
+                node.src = node.dataset.src;
+                if (node.complete) resolve();
+            }));
+            const fontReady = document.fonts ? document.fonts.ready.catch(() => {}) : Promise.resolve();
+            const pageReady = document.readyState === "complete" ? Promise.resolve() : new Promise(resolve => window.addEventListener("load", resolve, { once: true }));
+            const minimumHold = new Promise(resolve => setTimeout(resolve, 1200));
+            const maxHold = new Promise(resolve => setTimeout(resolve, 4200));
+            const ready = Promise.all([...deferredReady, fontReady, pageReady, minimumHold]);
+
+            Promise.race([ready, maxHold]).then(() => {
+                requestAnimationFrame(() => {
+                    if (window.finishLoadingScreen) {
+                        window.finishLoadingScreen();
+                    } else {
+                        root.classList.remove("is-loading");
+                        root.classList.add("is-ready");
+                    }
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

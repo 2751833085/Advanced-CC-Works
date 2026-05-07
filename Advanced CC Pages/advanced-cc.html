@@ -1,11 +1,14 @@
-<html>
+<!DOCTYPE html>
+<html lang="en" class="is-loading">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Advanced CC Works</title>
     <link rel="stylesheet" href="advanced-cc.css">
 </head>
 <body>
-    <a href="../index.html" class="back">← Back</a>
+    <script src="../loading-particle.js"></script>
+    <button class="back" type="button" data-route="../index.html">← Back</button>
     <h1>Advanced CC <u>Works</u></h1>
 
     <div class="grid">
@@ -15,24 +18,73 @@
         </div>
 
         <div class="card">
-            <h2><a href="Assignment 2/assignment2.html">II. Words in Motion</a></h2>
+            <h2><button type="button" data-route="Assignment 2/assignment2.html">II. Words in Motion</button></h2>
             <p>Three words — Minimize, Procrastinate, and Irony — each expressed through three different dynamic visual interpretations using P5JS. Nine sketches in total exploring the essence of each word through motion and interaction.</p>
         </div>
 
         <div class="card">
-            <h2><a href="Experimental Camera/experimental-camera.html">III. Experimental Camera</a></h2>
+            <h2><button type="button" data-route="Experimental Camera/experimental-camera.html">III. Experimental Camera</button></h2>
             <p>Design and create an experimental camera with a specific purpose or usage in mind.</p>
         </div>
 
         <div class="card">
-            <h2><a href="Community Tool/community-tool.html">IV. Community Tool</a></h2>
-            <p>Phantopteryx Toolbox — a local-first web toolkit with image editing, optional AI server hooks, and a divination shell. Open the detail page to read more and launch the live toolbox.</p>
+            <h2><button type="button" data-route="Community Tool/community-tool.html">IV. Community Tool</button></h2>
+            <p>Phantopteryx Toolbox, old version — a local-first community tool that first combined image editing, optional AI server hooks, and a divination shell.</p>
         </div>
 
         <div class="card">
-            <h2><a href="https://github.com/2751833085/Advanced-CC-Works" target="_blank">View on GitHub →</a></h2>
+            <h2><button type="button" data-route="Digital Divination/digital-divination.html">V. Digital Divination</button></h2>
+            <p>Phantopteryx Toolbox by Oneiron, rebuilt from the old community tool into a Firebase-made image editing workspace with library slots, pro adjustments, history, metadata, export, and optional AI logic.</p>
+        </div>
+
+        <div class="card">
+            <h2><button type="button" data-external="https://github.com/2751833085/Advanced-CC-Works">View on GitHub →</button></h2>
             <p>Visit the GitHub page for the full source code.</p>
         </div>
     </div>
+    <script>
+        (() => {
+            const root = document.documentElement;
+            const loadImage = src => new Promise(resolve => {
+                const image = new Image();
+                image.onload = resolve;
+                image.onerror = resolve;
+                image.src = src;
+                if (image.complete) resolve();
+            });
+            const imageSources = Array.from(document.querySelectorAll("img[data-src]")).map(image => image.dataset.src).filter(Boolean);
+            const fontReady = document.fonts ? document.fonts.ready.catch(() => {}) : Promise.resolve();
+            const pageReady = document.readyState === "complete" ? Promise.resolve() : new Promise(resolve => window.addEventListener("load", resolve, { once: true }));
+            const minimumHold = new Promise(resolve => setTimeout(resolve, 1200));
+            const maxHold = new Promise(resolve => setTimeout(resolve, 4200));
+            const ready = Promise.all([...imageSources.map(loadImage), fontReady, pageReady, minimumHold]);
+
+            Promise.race([ready, maxHold]).then(() => {
+                document.querySelectorAll("[data-src]").forEach(node => {
+                    node.src = node.dataset.src;
+                });
+                requestAnimationFrame(() => {
+                    if (window.finishLoadingScreen) {
+                        window.finishLoadingScreen();
+                    } else {
+                        root.classList.remove("is-loading");
+                        root.classList.add("is-ready");
+                    }
+                });
+            });
+        })();
+
+        document.querySelectorAll("[data-route]").forEach(control => {
+            control.addEventListener("click", () => {
+                location.href = control.dataset.route;
+            });
+        });
+
+        document.querySelectorAll("[data-external]").forEach(control => {
+            control.addEventListener("click", () => {
+                window.open(control.dataset.external, "_blank", "noopener");
+            });
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,4 @@
+[constraints]
+max_cycles = 2
+max_cc = 140
+no_god_files = false
